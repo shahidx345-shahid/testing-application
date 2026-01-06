@@ -1,0 +1,10 @@
+﻿node.exe : npm warn exec The following package was not found and will be installed: eslint@9.39.2
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (npm warn exec T...: eslint@9.39.2:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Invalid option '--eslintrc' - perhaps you meant '--ext'?
+You're using eslint.config.js, some command line flags are no longer available. Please see 
+https://eslint.org/docs/latest/use/command-line-interface for details.

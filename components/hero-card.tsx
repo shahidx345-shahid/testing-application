@@ -1,6 +1,40 @@
-import { Rocket, CheckCircle2 } from "lucide-react"
+"use client"
 
+import { Rocket, CheckCircle2 } from "lucide-react"
+import { useWallet } from "@/hooks/use-wallet"
+import { FINANCIAL } from "@/lib/constants"
+import { Skeleton } from "@/components/ui/skeleton"
+
+/**
+ * HeroCard Component
+ * Displays yearly savings challenge with progress and daily target
+ */
 export function HeroCard() {
+  const { balance, loading } = useWallet()
+
+  const remaining = Math.max(0, FINANCIAL.YEARLY_SAVINGS_GOAL - balance)
+  const progress = Math.min(100, (balance / FINANCIAL.YEARLY_SAVINGS_GOAL) * 100)
+  const dailyTarget = (remaining / 365).toFixed(2)
+
+  if (loading) {
+    return (
+      <div className="bg-[#1E293B] rounded-2xl md:rounded-3xl p-4 sm:p-6 md:p-8 lg:p-10 flex flex-col lg:flex-row justify-between items-center lg:items-start text-white overflow-hidden relative mb-6 md:mb-8 gap-6 md:gap-8">
+        <div className="space-y-4 sm:space-y-5 md:space-y-6 relative z-10 flex-1 w-full lg:w-auto">
+          <Skeleton className="h-7 w-48 bg-slate-700/50" />
+          <div className="space-y-2 md:space-y-3">
+            <Skeleton className="h-10 w-64 bg-slate-700/50" />
+            <Skeleton className="h-6 w-72 bg-slate-700/50" />
+          </div>
+          <div className="flex gap-3 pt-4">
+            <Skeleton className="h-11 w-40 bg-slate-700/50 rounded-full" />
+            <Skeleton className="h-11 w-32 bg-slate-700/50 rounded-full" />
+          </div>
+        </div>
+        <Skeleton className="w-48 h-48 rounded-full bg-slate-700/50 shrink-0" />
+      </div>
+    )
+  }
+
   return (
     <div className="bg-[#1E293B] rounded-2xl md:rounded-3xl p-4 sm:p-6 md:p-8 lg:p-10 flex flex-col lg:flex-row justify-between items-center lg:items-start text-white overflow-hidden relative mb-6 md:mb-8 gap-6 md:gap-8">
       <div className="space-y-4 sm:space-y-5 md:space-y-6 relative z-10 flex-1 w-full lg:w-auto">
@@ -12,9 +46,9 @@ export function HeroCard() {
 
         <div className="space-y-2 md:space-y-3">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight">
-            Save <span className="text-brand-green">$10,000</span> This Year
+            Save <span className="text-brand-green">${remaining.toLocaleString()}</span> More This Year
           </h2>
-          <p className="text-slate-400 text-xs sm:text-sm md:text-base lg:text-lg">Just $27.40 a day. Small steps, big results.</p>
+          <p className="text-slate-400 text-xs sm:text-sm md:text-base lg:text-lg">Just ${dailyTarget} a day. Small steps, big results.</p>
         </div>
 
         <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 md:gap-4 pt-2 md:pt-4">
@@ -51,13 +85,13 @@ export function HeroCard() {
             strokeWidth="12"
             fill="transparent"
             strokeDasharray={2 * Math.PI * 80}
-            strokeDashoffset={2 * Math.PI * 80 * (1 - 0.123)}
+            strokeDashoffset={2 * Math.PI * 80 * (1 - progress / 100)}
             strokeLinecap="round"
             className="text-brand-green transition-all duration-1000"
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold">12.3%</span>
+          <span className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold">{progress.toFixed(1)}%</span>
           <span className="text-slate-400 text-xs sm:text-sm">Complete</span>
         </div>
       </div>

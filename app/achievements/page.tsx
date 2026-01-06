@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { ProtectedPage } from "@/components/protected-page"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { Sidebar } from "@/components/sidebar"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
@@ -42,7 +43,7 @@ const achievements = [
   },
 ]
 
-export default function AchievementsPage() {
+function AchievementsPageContent() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   return (
@@ -150,5 +151,13 @@ export default function AchievementsPage() {
         </div>
       </main>
     </div>
+  )
+}
+
+export default function AchievementsPage() {
+  return (
+    <ProtectedPage>
+      <AchievementsPageContent />
+    </ProtectedPage>
   )
 }

@@ -1,0 +1,238 @@
+"use client";
+
+import { useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Camera, Loader2, Save, X } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+
+export function EditProfile() {
+    const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState(false);
+    const [error, setError] = useState("");
+    const [formData, setFormData] = useState({
+        firstName: "",
+        lastName: "",
+        dateOfBirth: "",
+        address: "",
+        city: "",
+        state: "",
+        zipCode: "",
+        country: "",
+    });
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setError("");
+        setSuccess(false);
+
+        try {
+            const response = await fetch("/api/user/profile", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to update profile");
+            }
+
+            setSuccess(true);
+            setTimeout(() => setSuccess(false), 3000);
+        } catch (err: any) {
+            setError(err.message || "Failed to update profile");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="space-y-6 animate-fade-in">
+            {success && (
+                <Alert className="border-green-200 bg-green-50">
+                    <AlertDescription className="text-green-700">
+                        ✓ Profile updated successfully!
+                    </AlertDescription>
+                </Alert>
+            )}
+
+            {error && (
+                <Alert className="border-red-200 bg-red-50">
+                    <AlertDescription className="text-red-700">{error}</AlertDescription>
+                </Alert>
+            )}
+
+            {/* Profile Picture */}
+            <Card className="border-0 bg-white rounded-2xl sm:rounded-3xl shadow-lg">
+                <CardHeader className="px-4 sm:px-6">
+                    <CardTitle className="text-xl sm:text-2xl font-bold">Profile Picture</CardTitle>
+                    <CardDescription className="text-sm">Update your profile photo</CardDescription>
+                </CardHeader>
+                <CardContent className="px-4 sm:px-6">
+                    <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                        <Avatar className="w-20 h-20 sm:w-24 sm:h-24 border-4 border-gray-100">
+                            <AvatarImage src="/placeholder-avatar.png" />
+                            <AvatarFallback className="bg-brand-green text-white text-2xl">U</AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+                            <Button className="bg-brand-green hover:bg-brand-green/90 gap-2 w-full sm:w-auto text-sm">
+                                <Camera className="w-4 h-4" />
+                                Upload Photo
+                            </Button>
+                            <Button variant="outline" className="border-gray-300 w-full sm:w-auto text-sm">Remove</Button>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Personal Information */}
+            <Card className="border-0 bg-white rounded-2xl sm:rounded-3xl shadow-lg">
+                <CardHeader className="px-4 sm:px-6">
+                    <CardTitle className="text-xl sm:text-2xl font-bold">Personal Information</CardTitle>
+                    <CardDescription className="text-sm">Update your personal details</CardDescription>
+                </CardHeader>
+                <CardContent className="px-4 sm:px-6">
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <Label htmlFor="firstName">First Name</Label>
+                                <Input
+                                    id="firstName"
+                                    name="firstName"
+                                    value={formData.firstName}
+                                    onChange={handleChange}
+                                    placeholder="John"
+                                    className="border-gray-300"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="lastName">Last Name</Label>
+                                <Input
+                                    id="lastName"
+                                    name="lastName"
+                                    value={formData.lastName}
+                                    onChange={handleChange}
+                                    placeholder="Doe"
+                                    className="border-gray-300"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="dateOfBirth">Date of Birth</Label>
+                                <Input
+                                    id="dateOfBirth"
+                                    name="dateOfBirth"
+                                    type="date"
+                                    value={formData.dateOfBirth}
+                                    onChange={handleChange}
+                                    className="border-gray-300"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Address Section */}
+                        <div className="pt-6 border-t border-gray-200">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Address</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2 md:col-span-2">
+                                    <Label htmlFor="address">Street Address</Label>
+                                    <Input
+                                        id="address"
+                                        name="address"
+                                        value={formData.address}
+                                        onChange={handleChange}
+                                        placeholder="123 Main Street"
+                                        className="border-gray-300"
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="city">City</Label>
+                                    <Input
+                                        id="city"
+                                        name="city"
+                                        value={formData.city}
+                                        onChange={handleChange}
+                                        placeholder="New York"
+                                        className="border-gray-300"
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="state">State</Label>
+                                    <Input
+                                        id="state"
+                                        name="state"
+                                        value={formData.state}
+                                        onChange={handleChange}
+                                        placeholder="NY"
+                                        className="border-gray-300"
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="zipCode">ZIP Code</Label>
+                                    <Input
+                                        id="zipCode"
+                                        name="zipCode"
+                                        value={formData.zipCode}
+                                        onChange={handleChange}
+                                        placeholder="10001"
+                                        className="border-gray-300"
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="country">Country</Label>
+                                    <Input
+                                        id="country"
+                                        name="country"
+                                        value={formData.country}
+                                        onChange={handleChange}
+                                        placeholder="United States"
+                                        className="border-gray-300"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-6 border-t border-gray-200">
+                            <Button
+                                type="submit"
+                                disabled={loading}
+                                className="bg-brand-green hover:bg-brand-green/90 gap-2 w-full sm:flex-1 md:flex-none text-sm sm:text-base"
+                            >
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        Saving...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Save className="w-4 h-4" />
+                                        Save Changes
+                                    </>
+                                )}
+                            </Button>
+                            <Button type="button" variant="outline" className="border-gray-300">
+                                <X className="w-4 h-4 mr-2" />
+                                Cancel
+                            </Button>
+                        </div>
+                    </form>
+                </CardContent>
+            </Card>
+        </div>
+    );
+}

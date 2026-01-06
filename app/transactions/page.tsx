@@ -1,62 +1,57 @@
 "use client"
 
 import { useState } from "react"
+import { ProtectedPage } from "@/components/protected-page"
 import { Sidebar } from "@/components/sidebar"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
-import { Download, ArrowUpCircle, ArrowDownCircle, ChevronLeft, ChevronRight } from "lucide-react"
+import { Download, ArrowUpCircle, ArrowDownCircle, ChevronLeft, ChevronRight, Loader2, AlertCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useTransactions } from "@/hooks/use-transactions"
+import { Card, CardContent } from "@/components/ui/card"
 
-const transactions = [
-  {
-    id: "#12548796",
-    description: "Daily Auto-Save",
-    bank: "1234 ****",
-    date: "19 Jan 2026",
-    amount: "+$27.40",
-    status: "Completed",
-    type: "in",
-  },
-  {
-    id: "#12548796",
-    description: "Daily Auto-Save",
-    bank: "1234 ****",
-    date: "18 Jan 2026",
-    amount: "+$27.40",
-    status: "Completed",
-    type: "out",
-  },
-  {
-    id: "#12548796",
-    description: "Daily Auto-Save",
-    bank: "1234 ****",
-    date: "17 Jan 2026",
-    amount: "-",
-    status: "Failed",
-    type: "in",
-  },
-  {
-    id: "#12548796",
-    description: "Daily Auto-Save",
-    bank: "1234 ****",
-    date: "16 Jan 2026",
-    amount: "+$27.40",
-    status: "Completed",
-    type: "in",
-  },
-  {
-    id: "#12548796",
-    description: "Daily Auto-Save",
-    bank: "1234 ****",
-    date: "15 Jan 2026",
-    amount: "+$27.40",
-    status: "Completed",
-    type: "out",
-  },
-]
-
-export default function TransactionsPage() {
+function TransactionsPageContent() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
+
+  const { data: transactions, loading, error, refetch } = useTransactions({
+    limit: itemsPerPage,
+    offset: (currentPage - 1) * itemsPerPage
+  })
+
+  const hasNextPage = transactions && transactions.length === itemsPerPage
+  const hasPrevPage = currentPage > 1
+
+  const formatDate = (date: string) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    })
+  }
+
+  const getTransactionIcon = (type: string) => {
+    return type === 'credit' || type === 'deposit' ? (
+      <ArrowDownCircle className="w-5 h-5 text-brand-green" />
+    ) : (
+      <ArrowUpCircle className="w-5 h-5 text-red-600" />
+    )
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'completed':
+      case 'success':
+        return 'text-brand-green'
+      case 'pending':
+        return 'text-orange-600'
+      case 'failed':
+        return 'text-red-600'
+      default:
+        return 'text-gray-600'
+    }
+  }
 
   return (
     <div className="flex h-screen bg-[#F8FAFC] overflow-hidden">
@@ -75,96 +70,182 @@ export default function TransactionsPage() {
         <div className="flex-1 p-2 sm:p-3 md:p-6 lg:p-8 xl:p-10">
           <div className="max-w-7xl mx-auto space-y-3 sm:space-y-4 md:space-y-6">
 
-          <div className="flex justify-end mb-4 md:mb-6">
-            <button className="bg-brand-green hover:bg-emerald-600 text-white px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl flex items-center gap-2 text-xs md:text-sm font-semibold transition-colors shadow-sm shadow-emerald-200">
-              <Download className="w-4 h-4" />
-              <span className="hidden sm:inline">Export CSV</span>
-              <span className="sm:hidden">Export</span>
-            </button>
-          </div>
-
-          <div className="bg-white rounded-xl md:rounded-2xl lg:rounded-[32px] overflow-hidden border border-slate-100 shadow-sm mb-6 md:mb-8">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="text-slate-400 text-xs md:text-sm font-medium bg-slate-50">
-                    <th className="px-3 md:px-8 py-4 md:py-6 font-medium text-left">Description</th>
-                    <th className="px-3 md:px-8 py-4 md:py-6 font-medium text-left hidden sm:table-cell">Trans. ID</th>
-                    <th className="px-3 md:px-8 py-4 md:py-6 font-medium text-left hidden md:table-cell">Bank</th>
-                    <th className="px-3 md:px-8 py-4 md:py-6 font-medium text-left">Date</th>
-                    <th className="px-3 md:px-8 py-4 md:py-6 font-medium text-right">Amount</th>
-                    <th className="px-3 md:px-8 py-4 md:py-6 font-medium text-left hidden sm:table-cell">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {transactions.map((tx, i) => (
-                    <tr key={i} className="text-slate-700 hover:bg-slate-50 transition-colors text-xs md:text-sm">
-                      <td className="px-3 md:px-8 py-4 md:py-5">
-                        <div className="flex items-center gap-2 md:gap-3">
-                          <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
-                            {tx.type === "in" ? (
-                              <ArrowUpCircle className="w-4 h-4 md:w-5 md:h-5 text-blue-500" />
-                            ) : (
-                              <ArrowDownCircle className="w-4 h-4 md:w-5 md:h-5 text-blue-500" />
-                            )}
-                          </div>
-                          <span className="font-semibold text-slate-800 truncate">{tx.description}</span>
-                        </div>
-                      </td>
-                      <td className="px-3 md:px-8 py-4 md:py-5 font-medium hidden sm:table-cell">{tx.id}</td>
-                      <td className="px-3 md:px-8 py-4 md:py-5 font-medium hidden md:table-cell">{tx.bank}</td>
-                      <td className="px-3 md:px-8 py-4 md:py-5 font-medium whitespace-nowrap">{tx.date}</td>
-                      <td
-                        className={cn(
-                          "px-3 md:px-8 py-4 md:py-5 font-bold text-right whitespace-nowrap",
-                          tx.status === "Failed" ? "text-red-400" : "text-brand-green",
-                        )}
-                      >
-                        {tx.amount}
-                      </td>
-                      <td className="px-3 md:px-8 py-4 md:py-5 hidden sm:table-cell">
-                        <span
-                          className={cn(
-                            "px-2 py-1 md:px-4 md:py-1.5 rounded-full text-xs font-semibold border inline-block",
-                            tx.status === "Completed"
-                              ? "bg-emerald-50 text-brand-green border-emerald-200"
-                              : "bg-red-50 text-red-400 border-red-200",
-                          )}
-                        >
-                          {tx.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-end gap-1 md:gap-2 text-xs md:text-sm font-medium overflow-x-auto">
-            <button className="flex items-center gap-1 text-brand-green hover:underline px-2 py-1 whitespace-nowrap">
-              <ChevronLeft className="w-3 h-3 md:w-4 md:h-4" />
-              <span className="hidden sm:inline">Previous</span>
-            </button>
-            {[1, 2, 3, 4].map((page) => (
-              <button
-                key={page}
-                className={cn(
-                  "w-7 h-7 md:w-8 md:h-8 rounded-lg flex items-center justify-center transition-colors text-xs md:text-sm",
-                  page === 1 ? "bg-brand-green text-white" : "text-slate-400 hover:bg-slate-100",
-                )}
-              >
-                {page}
+            <div className="flex justify-end mb-4 md:mb-6">
+              <button className="bg-brand-green hover:bg-emerald-600 text-white px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl flex items-center gap-2 text-xs md:text-sm font-semibold transition-colors shadow-sm shadow-emerald-200">
+                <Download className="w-3 h-3 md:w-4 md:h-4" />
+                <span className="hidden sm:inline">Download CSV</span>
+                <span className="sm:hidden">Export</span>
               </button>
-            ))}
-            <button className="flex items-center gap-1 text-brand-green hover:underline px-2 py-1 whitespace-nowrap">
-              <span className="hidden sm:inline">Next</span>
-              <ChevronRight className="w-3 h-3 md:w-4 md:h-4" />
-            </button>
+            </div>
+
+            {/* Loading State */}
+            {loading ? (
+              <Card className="bg-white border border-slate-100 rounded-2xl md:rounded-3xl p-6">
+                <div className="space-y-4">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="flex items-center justify-between">
+                      <div className="flex items-center gap-4 flex-1">
+                        <div className="w-12 h-12 bg-slate-200 rounded-full animate-pulse" />
+                        <div className="flex-1 space-y-2">
+                          <div className="h-4 bg-slate-200 rounded w-1/3 animate-pulse" />
+                          <div className="h-3 bg-slate-200 rounded w-1/4 animate-pulse" />
+                        </div>
+                      </div>
+                      <div className="space-y-2 text-right">
+                        <div className="h-4 bg-slate-200 rounded w-20 animate-pulse ml-auto" />
+                        <div className="h-3 bg-slate-200 rounded w-16 animate-pulse ml-auto" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            ) : error ? (
+              /* Error State */
+              <Card className="bg-red-50 border-red-200 rounded-2xl md:rounded-3xl">
+                <CardContent className="p-6 flex flex-col items-center text-center">
+                  <AlertCircle className="w-12 h-12 text-red-600 mb-3" />
+                  <p className="text-red-800 font-semibold mb-2">Error Loading Transactions</p>
+                  <p className="text-red-600 text-sm mb-4">{error}</p>
+                  <button
+                    onClick={refetch}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    Retry
+                  </button>
+                </CardContent>
+              </Card>
+            ) : !transactions || transactions.length === 0 ? (
+              /* Empty State */
+              <Card className="bg-white border border-slate-100 rounded-2xl md:rounded-3xl p-8 text-center">
+                <p className="text-slate-600 text-lg mb-2">No transactions yet</p>
+                <p className="text-slate-400 text-sm">Your transaction history will appear here</p>
+              </Card>
+            ) : (
+              <>
+                {/* Transactions Table */}
+                <div className="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                  <div className="overflow-x-auto hide-scrollbar">
+                    <table className="w-full">
+                      <thead className="bg-slate-50 border-b border-slate-100">
+                        <tr>
+                          <th className="text-left px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm font-semibold text-slate-600 uppercase tracking-wider">
+                            Transaction
+                          </th>
+                          <th className="text-left px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm font-semibold text-slate-600 uppercase tracking-wider hidden sm:table-cell">
+                            Date
+                          </th>
+                          <th className="text-right px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm font-semibold text-slate-600 uppercase tracking-wider">
+                            Amount
+                          </th>
+                          <th className="text-right px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm font-semibold text-slate-600 uppercase tracking-wider">
+                            Status
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {transactions.map((tx: any, index: number) => (
+                          <tr
+                            key={tx._id || index}
+                            className="hover:bg-slate-50 transition-colors"
+                          >
+                            <td className="px-3 md:px-6 py-3 md:py-4">
+                              <div className="flex items-center gap-3">
+                                <div className={cn(
+                                  "w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shrink-0",
+                                  tx.type === 'credit' || tx.type === 'deposit'
+                                    ? "bg-emerald-50"
+                                    : "bg-red-50"
+                                )}>
+                                  {getTransactionIcon(tx.type)}
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="text-xs md:text-sm font-semibold text-slate-800 truncate">
+                                    {tx.description || 'Transaction'}
+                                  </p>
+                                  <p className="text-xs text-slate-500 sm:hidden">
+                                    {formatDate(tx.createdAt)}
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-slate-600 hidden sm:table-cell">
+                              {formatDate(tx.createdAt)}
+                            </td>
+                            <td className="px-3 md:px-6 py-3 md:py-4 text-right">
+                              <span className={cn(
+                                "text-xs md:text-sm font-bold",
+                                tx.type === 'credit' || tx.type === 'deposit'
+                                  ? "text-brand-green"
+                                  : "text-red-600"
+                              )}>
+                                {tx.type === 'credit' || tx.type === 'deposit' ? '+' : '-'}
+                                ${tx.amount?.toFixed(2) || '0.00'}
+                              </span>
+                            </td>
+                            <td className="px-3 md:px-6 py-3 md:py-4 text-right">
+                              <span className={cn(
+                                "text-xs font-semibold uppercase tracking-wide px-2 py-1 rounded",
+                                getStatusColor(tx.status)
+                              )}>
+                                {tx.status}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Pagination */}
+                <div className="flex items-center justify-between px-4 py-3 bg-white rounded-lg border border-slate-100">
+                  <button
+                    onClick={() => setCurrentPage(p => p - 1)}
+                    disabled={!hasPrevPage}
+                    className={cn(
+                      "flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition-colors",
+                      hasPrevPage
+                        ? "bg-slate-100 hover:bg-slate-200 text-slate-700"
+                        : "bg-slate-50 text-slate-400 cursor-not-allowed"
+                    )}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    <span className="hidden sm:inline">Previous</span>
+                    <span className="sm:hidden">Prev</span>
+                  </button>
+
+                  <span className="text-xs md:text-sm text-slate-600 font-medium">
+                    Page {currentPage}
+                  </span>
+
+                  <button
+                    onClick={() => setCurrentPage(p => p + 1)}
+                    disabled={!hasNextPage}
+                    className={cn(
+                      "flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition-colors",
+                      hasNextPage
+                        ? "bg-slate-100 hover:bg-slate-200 text-slate-700"
+                        : "bg-slate-50 text-slate-400 cursor-not-allowed"
+                    )}
+                  >
+                    <span className="hidden sm:inline">Next</span>
+                    <span className="sm:hidden">Next</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </>
+            )}
           </div>
-        </div>
         </div>
       </main>
     </div>
+  )
+}
+
+export default function TransactionsPage() {
+  return (
+    <ProtectedPage>
+      <TransactionsPageContent />
+    </ProtectedPage>
   )
 }

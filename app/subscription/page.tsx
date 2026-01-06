@@ -1,5 +1,7 @@
 "use client"
 
+import { ProtectedPage } from "@/components/protected-page"
+
 import { useState } from "react"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { Sidebar } from "@/components/sidebar"
@@ -17,7 +19,7 @@ const billingHistory = [
   },
 ]
 
-export default function SubscriptionPage() {
+function SubscriptionPageContent() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   return (
@@ -112,5 +114,13 @@ export default function SubscriptionPage() {
         </div>
       </main>
     </div>
+  )
+}
+
+export default function SubscriptionPage() {
+  return (
+    <ProtectedPage>
+      <SubscriptionPageContent />
+    </ProtectedPage>
   )
 }

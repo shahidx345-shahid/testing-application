@@ -1,16 +1,36 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Hide scrollbar utility for better UX on horizontal scroll - Enhanced with !important */
+.hide-scrollbar {
+  -ms-overflow-style: none !important;
+  /* IE and Edge */
+  scrollbar-width: none !important;
+  /* Firefox */
+  overflow: -moz-scrollbars-none !important;
+  /* Old Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  /* Chrome, Safari, Opera */
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.98 0.01 165); /* Very light mint/greenish white */
+  --background: oklch(0.98 0.01 165);
+  /* Very light mint/greenish white */
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.627 0.194 149.223); /* Emerald-500 equivalent */
+  --primary: oklch(0.627 0.194 149.223);
+  /* Emerald-500 equivalent */
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -77,7 +97,8 @@
 @theme inline {
   --font-sans: "Geist", "Geist Fallback";
   --font-mono: "Geist Mono", "Geist Mono Fallback";
-  --color-brand-green: #10b981;
+  --color-brand-green: #04C988;
+  --color-brand-green-light: #F0FDF4;
   --color-dark-navy: #0f172a;
   --color-light-mint: #f0f9f6;
   --color-sidebar-item-active: #ecfdf5;
@@ -124,7 +145,629 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Smooth transitions for ALL elements */
+  *,
+  *::before,
+  *::after {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+  }
+
+  /* Enhanced button animations - apply to ALL buttons (except in sidebar/header) */
+  button:not(:disabled):not([data-no-hover]),
+  a:not([href="#"]):not([data-no-hover]),
+  [role="button"]:not(:disabled):not([data-no-hover]) {
+    @apply transition-all duration-200 ease-in-out;
+  }
+
+  button:not(:disabled):not([data-no-hover]):hover,
+  a:not([href="#"]):not([data-no-hover]):hover,
+  [role="button"]:not(:disabled):not([data-no-hover]):hover {
+    @apply scale-[1.02];
+  }
+
+  button:not(:disabled):not([data-no-hover]):active,
+  a:not([href="#"]):not([data-no-hover]):active,
+  [role="button"]:not(:disabled):not([data-no-hover]):active {
+    @apply scale-95;
+  }
+
+  /* Universal card hover effects - automatically apply to ALL card-like elements (but not in sidebar) */
+
+  /* White background cards - exclude sidebar and header */
+  main div.bg-white,
+  main div[class*="bg-white"],
+  main section.bg-white,
+  main section[class*="bg-white"] {
+    @apply transition-all duration-300 cursor-pointer;
+  }
+
+  main div.bg-white:hover,
+  main div[class*="bg-white"]:hover,
+  main section.bg-white:hover,
+  main section[class*="bg-white"]:hover {
+    @apply shadow-xl -translate-y-0.5 scale-[1.005];
+  }
+
+  /* Gradient background cards */
+  main div[class*="bg-gradient"],
+  main section[class*="bg-gradient"] {
+    @apply transition-all duration-300 cursor-pointer;
+  }
+
+  main div[class*="bg-gradient"]:hover,
+  main section[class*="bg-gradient"]:hover {
+    @apply shadow-lg scale-[1.005];
+  }
+
+  /* Slate/gray background cards */
+  main div[class*="bg-slate"],
+  main div[class*="bg-gray"],
+  main section[class*="bg-slate"],
+  main section[class*="bg-gray"] {
+    @apply transition-all duration-300;
+  }
+
+  main div[class*="bg-slate"]:hover,
+  main div[class*="bg-gray"]:hover,
+  main section[class*="bg-slate"]:hover,
+  main section[class*="bg-gray"]:hover {
+    @apply shadow-lg brightness-105;
+  }
+
+  /* All rounded elements with padding (card-like) - only in main content */
+  main div[class*="rounded-"][class*="p-"],
+  main section[class*="rounded-"][class*="p-"] {
+    @apply transition-all duration-300;
+  }
+
+  main div[class*="rounded-"][class*="p-"]:hover,
+  main section[class*="rounded-"][class*="p-"]:hover {
+    @apply shadow-lg;
+  }
+
+  /* Elements with shadow (clearly cards) - only in main content */
+  main div[class*="shadow"]:not(.shadow-sm):not(.shadow-md),
+  main section[class*="shadow"]:not(.shadow-sm):not(.shadow-md) {
+    @apply transition-all duration-300 cursor-pointer;
+  }
+
+  main div[class*="shadow"]:not(.shadow-sm):not(.shadow-md):hover,
+  main section[class*="shadow"]:not(.shadow-sm):not(.shadow-md):hover {
+    @apply shadow-2xl -translate-y-1;
+  }
+
+  /* Specific card hover class for enhanced effects */
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:scale-[1.01] cursor-pointer;
+  }
+
+  /* Enhanced link styles - all links */
+  a {
+    @apply transition-colors duration-200;
+  }
+
+  a:hover {
+    @apply opacity-80;
+  }
+
+  /* Input focus effects - all inputs */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    @apply ring-2 ring-brand-green ring-offset-2 transition-all duration-200;
+  }
+
+  /* Image hover effects - only in main content */
+  main img {
+    @apply transition-all duration-300;
+  }
+
+  main img:hover {
+    @apply brightness-110 scale-[1.02];
+  }
+
+  /* Icon hover effects - only standalone icons, not in sidebar */
+  main svg:not([data-no-hover]) {
+    @apply transition-all duration-200;
+  }
+
+  main svg:not([data-no-hover]):hover {
+    @apply scale-110;
+  }
+}
+
+/* ===================================
+   RESPONSIVE UTILITIES
+   =================================== */
+
+/* Mobile-first responsive breakpoints */
+/* sm: 640px, md: 768px, lg: 1024px, xl: 1280px, 2xl: 1536px */
+
+/* Ensure all text is readable on mobile */
+@layer utilities {
+  .text-responsive {
+    @apply text-sm sm:text-base md:text-lg;
+  }
+
+  .heading-responsive {
+    @apply text-xl sm:text-2xl md:text-3xl lg:text-4xl;
+  }
+
+  .subheading-responsive {
+    @apply text-lg sm:text-xl md:text-2xl;
+  }
+}
+
+/* Responsive spacing utilities */
+.container-responsive {
+  @apply px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12;
+}
+
+.section-spacing {
+  @apply py-6 sm:py-8 md:py-10 lg:py-12 xl:py-16;
+}
+
+/* Responsive grid utilities */
+.grid-responsive {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6;
+}
+
+.grid-2-col {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6;
+}
+
+/* Mobile menu utilities */
+.mobile-menu-item {
+  @apply text-base sm:text-lg py-3 sm:py-4;
+}
+
+/* Responsive cards */
+.card-responsive {
+  @apply p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-3xl;
+}
+
+/* Touch-friendly buttons on mobile */
+.btn-responsive {
+  @apply px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base min-h-[44px] sm:min-h-[48px];
+}
+
+/* Responsive images */
+.img-responsive {
+  @apply w-full h-auto;
+}
+
+/* Hide on mobile, show on desktop */
+.desktop-only {
+  @apply hidden lg:block;
+}
+
+/* Show on mobile only */
+.mobile-only {
+  @apply block lg:hidden;
+}
+
+/* Responsive flexbox */
+.flex-responsive {
+  @apply flex-col sm:flex-row;
+}
+
+/* ===================================
+   MOBILE OPTIMIZATIONS
+   =================================== */
+
+/* Prevent zoom on input focus (iOS) */
+@media screen and (max-width: 640px) {
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  textarea,
+  select {
+    font-size: 16px !important;
+    /* Prevents iOS zoom */
+  }
+}
+
+/* Touch-friendly spacing on mobile */
+@media screen and (max-width: 768px) {
+
+  /* Larger touch targets on mobile */
+  button,
+  a,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Better spacing for thumbs */
+  .interactive-list>* {
+    margin-bottom: 0.75rem;
+  }
+}
+
+/* ===================================
+   TABLET OPTIMIZATIONS
+   =================================== */
+
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+
+  /* Optimize for tablet view */
+  .tablet-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ===================================
+   SAFE AREA SUPPORT (for notched devices)
+   =================================== */
+
+@supports (padding: max(0px)) {
+  .safe-area-inset {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* ===================================
+   PRINT STYLES
+   =================================== */
+
+@media print {
+
+  /* Hide navigation and non-essential elements */
+  nav,
+  .sidebar,
+  .mobile-menu,
+  button,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Optimize for printing */
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Page breaks */
+  .page-break {
+    page-break-after: always;
+  }
+}
+
+/* ===================================
+   ACCESSIBILITY IMPROVEMENTS
+   =================================== */
+
+/* Focus visible for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  * {
+    border-color: currentColor !important;
+  }
+}
+
+/* ===================================
+   DARK MODE READY (for future)
+   =================================== */
+
+@media (prefers-color-scheme: dark) {
+
+  /* Dark mode styles can be added here when needed */
+  .dark-mode-ready {
+    /* Future dark mode support */
+  }
+}
+
+/* Custom Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* New Professional Animations */
+@keyframes blob {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+@keyframes pulse-scale {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes bounce-slow {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes bounce-dot {
+
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin-slower {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ping-slow {
+
+  75%,
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes ping-slower {
+
+  75%,
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes ping-slowest {
+
+  75%,
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer-fast {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+/* Animation Classes */
+.animate-fade-in {
+  animation: fade-in 0.7s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.5s ease-out forwards;
+}
+
+.animate-shimmer {
+  animation: shimmer 1s infinite;
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animate-pulse-scale {
+  animation: pulse-scale 2s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 1.5s ease-in-out infinite;
+}
+
+.animate-bounce-dot {
+  animation: bounce-dot 1.4s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+.animate-spin-slower {
+  animation: spin-slower 4s linear infinite;
+}
+
+.animate-spin-slowest {
+  animation: spin-slow 5s linear infinite;
+}
+
+.animate-spin-reverse {
+  animation: spin-reverse 1.5s linear infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-ping-slow {
+  animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.animate-ping-slower {
+  animation: ping-slower 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.animate-ping-slowest {
+  animation: ping-slowest 4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.animate-shimmer-fast {
+  animation: shimmer-fast 1.5s infinite;
+}
+
+/* Animation Delays */
+.animation-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animation-delay-400 {
+  animation-delay: 400ms;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
 }
