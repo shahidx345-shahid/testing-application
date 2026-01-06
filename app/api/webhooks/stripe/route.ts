@@ -1,14 +1,29 @@
 import { NextRequest, NextResponse } from "next/server"
 import Stripe from "stripe"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2024-11-20",
-} as any)
-
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || ""
+// Initialize Stripe inside request handler to ensure env vars are available at runtime
+function getStripe() {
+  const apiKey = process.env.STRIPE_SECRET_KEY
+  if (!apiKey) {
+    throw new Error("STRIPE_SECRET_KEY environment variable is not set")
+  }
+  return new Stripe(apiKey, {
+    apiVersion: "2024-11-20",
+  } as any)
+}
 
 export async function POST(request: NextRequest) {
   try {
+    const stripe = getStripe()
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || ""
+
+    if (!webhookSecret) {
+      return NextResponse.json(
+        { error: "Webhook secret not configured" },
+        { status: 500 }
+      )
+    }
+
     const body = await request.text()
     const signature = request.headers.get("stripe-signature")
 
