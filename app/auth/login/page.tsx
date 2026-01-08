@@ -33,6 +33,7 @@ export default function LoginPage() {
       });
 
       const data = await response.json();
+      console.log("Login response:", { status: response.status, ok: response.ok, data });
 
       if (!response.ok) {
         setError(data.error || "Login failed");
@@ -41,6 +42,7 @@ export default function LoginPage() {
       }
 
       // Login successful - redirect to dashboard
+      console.log("Login successful, redirecting to dashboard...");
       router.push("/");
     } catch (err) {
       console.error("Login error:", err);
@@ -54,74 +56,80 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
+    <div className="min-h-screen flex">
       {/* Left Side - Dark Green */}
-      <div className="w-full lg:w-1/2 bg-gradient-to-b from-[#064E3B] to-[#0D6948] text-white p-4 sm:p-6 lg:p-8 xl:p-12 flex flex-col justify-start lg:justify-between">
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-b from-[#064E3B] to-[#0D6948] text-white p-12 flex-col justify-between">
         <div>
           {/* Logo */}
-          <div className="mb-2 sm:mb-4 lg:mb-12 lg:mb-16">
+          <div className="mb-16">
             <img
               src="/login-logo.png"
               alt="Save2740 Logo"
-              className="h-8 sm:h-10 lg:h-16 w-auto"
+              className="h-16 w-auto"
             />
           </div>
 
           {/* Heading */}
-          <h1 className="text-lg sm:text-xl lg:text-4xl xl:text-5xl font-bold leading-tight mb-1.5 sm:mb-2 lg:mb-6">
-            Master Your Savings Habit.
+          <h1 className="text-5xl font-bold leading-tight mb-6">
+            Save $10,000 in a year — one day at a time.
           </h1>
 
           {/* Description */}
-          <p className="text-xs sm:text-xs lg:text-base xl:text-lg text-gray-100 max-w-md leading-relaxed">
+          <p className="text-lg text-gray-100 max-w-md">
             Join the $27.40 daily challenge. Turn small consistent actions into massive yearly results ($10,000+).
           </p>
         </div>
 
         {/* Features at bottom */}
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 lg:gap-8 mt-4 lg:mt-0">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 rounded-full bg-[#10B981] flex items-center justify-center flex-shrink-0">
-              <Check size={12} className="text-white sm:w-3 lg:w-5" strokeWidth={3} />
+        <div className="flex items-center gap-8 flex-nowrap">
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-[#10B981] flex items-center justify-center flex-shrink-0">
+              <Check size={18} className="text-white" strokeWidth={3} />
             </div>
-            <span className="text-xs lg:text-base text-gray-100 font-medium">Streak Tracking</span>
+            <span className="text-base text-gray-100 font-medium whitespace-nowrap">Streak Tracking</span>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 rounded-full bg-[#10B981] flex items-center justify-center flex-shrink-0">
-              <Check size={12} className="text-white sm:w-3 lg:w-5" strokeWidth={3} />
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-[#10B981] flex items-center justify-center flex-shrink-0">
+              <Check size={18} className="text-white" strokeWidth={3} />
             </div>
-            <span className="text-xs lg:text-base text-gray-100 font-medium">Multipliers</span>
+            <span className="text-base text-gray-100 font-medium whitespace-nowrap">Multipliers</span>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 rounded-full bg-[#10B981] flex items-center justify-center flex-shrink-0">
-              <Check size={12} className="text-white sm:w-3 lg:w-5" strokeWidth={3} />
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-[#10B981] flex items-center justify-center flex-shrink-0">
+              <Check size={18} className="text-white" strokeWidth={3} />
             </div>
-            <span className="text-xs lg:text-base text-gray-100 font-medium">Secure Wallet</span>
+            <span className="text-base text-gray-100 font-medium whitespace-nowrap">Secure Wallet</span>
+          </div>
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-[#10B981] flex items-center justify-center flex-shrink-0">
+              <Check size={18} className="text-white" strokeWidth={3} />
+            </div>
+            <span className="text-base text-gray-100 font-medium whitespace-nowrap">Group Contribution</span>
           </div>
         </div>
       </div>
 
       {/* Right Side - Login Form */}
-      <div className="w-full lg:w-1/2 bg-gray-50 flex items-center justify-center p-4 sm:p-6 py-6 lg:py-0 min-h-auto lg:min-h-screen">
+      <div className="w-full lg:w-1/2 bg-gray-50 flex items-center justify-center p-6">
         <div className="w-full max-w-md">
           {/* Heading */}
-          <div className="text-center mb-6 sm:mb-8">
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-            <p className="text-xs sm:text-sm lg:text-base text-gray-600">Enter your email and password to sign in</p>
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
+            <p className="text-gray-600">Enter your email and password to sign in</p>
           </div>
 
           {/* Error Alert */}
           {error && (
-            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-700 text-xs sm:text-sm">{error}</p>
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-700 text-sm">{error}</p>
             </div>
           )}
 
           {/* Form */}
-          <form onSubmit={handleLogin} className="space-y-4 sm:space-y-6">
+          <form onSubmit={handleLogin} className="space-y-6">
             {/* Email Field */}
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-900 mb-1 sm:mb-2">
+              <label className="block text-sm font-medium text-gray-900 mb-2">
                 Email
               </label>
               <input
@@ -130,14 +138,14 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10B981] focus:border-transparent placeholder-gray-400 text-gray-900 disabled:opacity-50 text-sm"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10B981] focus:border-transparent placeholder-gray-400 text-gray-900 disabled:opacity-50"
                 required
               />
             </div>
 
             {/* Password Field */}
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-900 mb-1 sm:mb-2">
+              <label className="block text-sm font-medium text-gray-900 mb-2">
                 Password
               </label>
               <div className="relative">
@@ -147,7 +155,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}
-                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10B981] focus:border-transparent placeholder-gray-400 text-gray-900 disabled:opacity-50 pr-10 text-sm"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10B981] focus:border-transparent placeholder-gray-400 text-gray-900 disabled:opacity-50 pr-10"
                   required
                 />
                 <button
@@ -155,25 +163,25 @@ export default function LoginPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
             </div>
 
             {/* Remember Me & Forgot Password */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
+            <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 sm:w-5 sm:h-5 accent-[#10B981] rounded cursor-pointer"
+                  className="w-5 h-5 accent-[#10B981] rounded cursor-pointer"
                 />
-                <span className="text-xs sm:text-sm text-gray-700">Remember me</span>
+                <span className="text-sm text-gray-700">Remember me</span>
               </label>
               <a
                 href="#"
-                className="text-xs sm:text-sm text-[#10B981] hover:text-[#0D8659] font-medium"
+                className="text-sm text-[#10B981] hover:text-[#0D8659] font-medium"
               >
                 Forgot Password?
               </a>
@@ -183,15 +191,15 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-[#10B981] hover:bg-[#0D8659] disabled:opacity-50 text-white font-bold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg transition-colors disabled:cursor-not-allowed text-sm sm:text-base"
+              className="w-full bg-[#10B981] hover:bg-[#0D8659] disabled:opacity-50 text-white font-bold py-3 px-6 rounded-lg transition-colors disabled:cursor-not-allowed"
             >
               {isLoading ? "SIGNING IN..." : "SIGN IN"}
             </button>
           </form>
 
           {/* Sign Up Link */}
-          <div className="mt-6 sm:mt-8 text-center">
-            <p className="text-gray-600 text-xs sm:text-sm">
+          <div className="mt-8 text-center">
+            <p className="text-gray-600 text-sm">
               Don't have an account?{" "}
               <Link
                 href="/auth/signup"

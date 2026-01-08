@@ -129,7 +129,7 @@ export default function SignUpPage() {
           <div className="flex items-center justify-between mb-4">
             <button
               onClick={handleBack}
-              className="text-[#10B981] hover:text-[#0D8659] transition-colors"
+              className="text-teal-600 hover:text-teal-700 transition-colors"
             >
               <ChevronLeft size={24} />
             </button>
@@ -139,7 +139,7 @@ export default function SignUpPage() {
           </div>
           <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
             <div
-              className="h-full bg-[#10B981] transition-all duration-300"
+              className="h-full bg-teal-600 transition-all duration-300"
               style={{ width: `${(step / 2) * 100}%` }}
             ></div>
           </div>
@@ -148,8 +148,8 @@ export default function SignUpPage() {
         {/* Step 1 - Create Account */}
         {step === 1 && (
           <div className="max-w-md mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
-            <p className="text-gray-600 text-sm mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
+            <p className="text-gray-600 text-xs sm:text-sm mb-8">
               Let's get your profile set up to track your progress.
             </p>
 
@@ -171,7 +171,7 @@ export default function SignUpPage() {
                   placeholder="e.g Alex Johnson"
                   value={profileData.firstName}
                   onChange={handleProfileChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10B981] focus:border-transparent placeholder-gray-400 text-gray-900"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent placeholder-gray-400 text-gray-900"
                   required
                 />
               </div>
@@ -187,7 +187,7 @@ export default function SignUpPage() {
                   placeholder="name@example.com"
                   value={profileData.email}
                   onChange={handleProfileChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10B981] focus:border-transparent placeholder-gray-400 text-gray-900"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent placeholder-gray-400 text-gray-900"
                   required
                 />
               </div>
@@ -204,7 +204,7 @@ export default function SignUpPage() {
                     placeholder="Your password"
                     value={profileData.password}
                     onChange={handleProfileChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10B981] focus:border-transparent placeholder-gray-400 text-gray-900 pr-10"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent placeholder-gray-400 text-gray-900 pr-10"
                     required
                   />
                   <button
@@ -220,7 +220,7 @@ export default function SignUpPage() {
               {/* Next Button */}
               <button
                 type="submit"
-                className="w-full bg-[#10B981] hover:bg-[#0D8659] text-white font-bold py-3 px-6 rounded-lg transition-colors mt-8"
+                className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg transition-colors mt-8"
               >
                 Next: Choose Challenge
               </button>
@@ -230,7 +230,7 @@ export default function SignUpPage() {
             <div className="mt-6 text-center">
               <p className="text-gray-600 text-sm">
                 Already have an account?{" "}
-                <Link href="/auth/login" className="text-[#10B981] hover:text-[#0D8659] font-bold">
+                <Link href="/auth/login" className="text-teal-600 hover:text-teal-700 font-bold">
                   Login
                 </Link>
               </p>
@@ -241,7 +241,7 @@ export default function SignUpPage() {
         {/* Step 2 - Choose Challenge */}
         {step === 2 && (
           <div className="max-w-lg mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8">Choose Your Challenge</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8">Choose Your Challenge</h2>
 
             {/* Challenge Options */}
             <div className="grid grid-cols-3 gap-4 mb-8">
@@ -250,7 +250,7 @@ export default function SignUpPage() {
                   key={key}
                   onClick={() => setChallengeData({ ...challengeData, selectedChallenge: key })}
                   className={`p-6 rounded-lg border-2 transition-all ${challengeData.selectedChallenge === key
-                      ? "border-[#10B981] bg-emerald-50"
+                      ? "border-teal-600 bg-blue-50"
                       : "border-gray-200 bg-white hover:border-gray-300"
                     }`}
                 >
@@ -266,7 +266,7 @@ export default function SignUpPage() {
             <div className="mb-8">
               <div className="font-bold text-gray-900 mb-6">
                 <span className="text-gray-700">Multiplier: </span>
-                <span className="text-[#10B981]">x{challengeData.selectedMultiplier}</span>
+                <span className="text-teal-600">x{challengeData.selectedMultiplier}</span>
               </div>
 
               {/* Slider with track and labels */}
@@ -274,11 +274,11 @@ export default function SignUpPage() {
                 {/* Track container */}
                 <div className="relative h-10 mb-2">
                   {/* Background track */}
-                  <div className="absolute top-3 left-0 right-0 h-2 bg-emerald-100 rounded-full"></div>
+                  <div className="absolute top-3 left-0 right-0 h-2 bg-blue-100 rounded-full"></div>
 
                   {/* Active track */}
                   <div
-                    className="absolute top-3 h-2 bg-[#10B981] rounded-full transition-all duration-200"
+                    className="absolute top-3 h-2 bg-teal-600 rounded-full transition-all duration-200"
                     style={{
                       width: `calc(${((challengeData.selectedMultiplier - 1) / 9) * 100}% + 8px)`,
                     }}
@@ -286,7 +286,7 @@ export default function SignUpPage() {
 
                   {/* Slider dot */}
                   <div
-                    className="absolute top-0 w-8 h-8 bg-[#10B981] rounded-full border-4 border-white shadow-lg transition-all duration-200 cursor-pointer"
+                    className="absolute top-0 w-8 h-8 bg-teal-600 rounded-full border-4 border-white shadow-lg transition-all duration-200 cursor-pointer"
                     style={{
                       left: `${((challengeData.selectedMultiplier - 1) / 9) * 100}%`,
                       transform: 'translateX(-50%)',
@@ -301,7 +301,7 @@ export default function SignUpPage() {
                       key={mult}
                       onClick={() => setChallengeData({ ...challengeData, selectedMultiplier: mult })}
                       className={`transition-colors ${challengeData.selectedMultiplier === mult
-                          ? "text-[#10B981] font-bold"
+                          ? "text-teal-600 font-bold"
                           : "text-gray-600 hover:text-gray-900"
                         }`}
                     >
@@ -317,7 +317,7 @@ export default function SignUpPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm text-gray-400 mb-2">Your Commitment</div>
-                  <div className="text-5xl font-bold text-[#10B981]">
+                  <div className="text-5xl font-bold text-teal-400">
                     ${dailyAmount.toFixed(2)}
                   </div>
                   <div className="text-sm text-gray-400 mt-2">per Day</div>
@@ -335,7 +335,7 @@ export default function SignUpPage() {
             <button
               onClick={handleCompleteSignup}
               disabled={isLoading}
-              className="w-full bg-[#10B981] hover:bg-[#0D8659] disabled:opacity-50 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
             >
               {isLoading ? "Creating Account..." : "Start Saving Now →"}
             </button>

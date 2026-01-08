@@ -98,6 +98,26 @@ const SubscriptionIcon = ({ className }: { className?: string }) => (
   />
 )
 
+// Custom Group Contribution Icon Component (SVG)
+const GroupContributionIcon = ({ className }: { className?: string }) => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <circle cx="9" cy="7" r="4" fill="currentColor"></circle>
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+  </svg>
+)
+
 const navItems = [
   { icon: DashboardIcon, label: "Dashboard", href: "/", isDashboard: true },
   { icon: WalletIcon, label: "My Wallet", href: "/my-wallet", isWallet: true },
@@ -105,6 +125,7 @@ const navItems = [
   { icon: AchievementsIcon, label: "Achievements", href: "/achievements" },
   { icon: SaverPocketsIcon, label: "Saver Pockets", href: "/saver-pockets" },
   { icon: ReferralsIcon, label: "Referrals", href: "/referrals" },
+  { icon: GroupContributionIcon, label: "Group Contribution", href: "/group-contribution" },
   { icon: SubscriptionIcon, label: "Subscription", href: "/subscription" },
 ]
 
