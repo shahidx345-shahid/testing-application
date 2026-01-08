@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { ProtectedPage } from "@/components/protected-page"
-import { 
-  Users, RotateCcw, Lock, Loader2, AlertCircle, Plus, Copy, Check, 
-  Send, Calendar, DollarSign, ArrowRight, Trash2, Eye, EyeOff 
+import {
+  Users, RotateCcw, Lock, Loader2, AlertCircle, Plus, Copy, Check,
+  Send, Calendar, DollarSign, ArrowRight, Trash2, Eye, EyeOff
 } from "lucide-react"
 import { Sidebar } from "@/components/sidebar"
 import { DashboardHeader } from "@/components/dashboard-header"
@@ -127,7 +127,7 @@ function GroupContributionPageContent() {
         },
       ]
       setGroups(mockGroups)
-      
+
       // Mock transactions
       const mockTransactions: Transaction[] = [
         {
@@ -249,7 +249,7 @@ function GroupContributionPageContent() {
     setLoading(true)
     try {
       const amount = parseFloat(contributionData.amount)
-      
+
       // Create transaction
       const newTransaction: Transaction = {
         id: `t-${Date.now()}`,
@@ -419,7 +419,7 @@ function GroupContributionPageContent() {
                   // My Groups View
                   <>
                     <div className="flex justify-between items-center mb-6">
-                      <h2 className="text-2xl font-bold text-white">My Groups</h2>
+                      <h2 className="text-2xl font-bold text-slate-900">My Groups</h2>
                       <button
                         onClick={() => setView("create")}
                         className="flex items-center gap-2 bg-brand-green hover:bg-brand-green/90 text-dark-navy px-4 py-2 rounded-lg font-semibold transition-colors"
@@ -443,7 +443,7 @@ function GroupContributionPageContent() {
                               </div>
                               <span className="bg-brand-green/10 text-brand-green px-3 py-1 rounded-full text-xs font-semibold">{group.frequency}</span>
                             </div>
-                            
+
                             <div className="grid grid-cols-3 gap-3 mb-4">
                               <div className="bg-slate-50 p-3 rounded-lg">
                                 <p className="text-slate-500 text-xs mb-1">Members</p>

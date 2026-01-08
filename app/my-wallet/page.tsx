@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { ProtectedPage } from "@/components/protected-page"
 import { DashboardHeader } from "@/components/dashboard-header"
-import { WalletSidebar } from "@/components/wallet-sidebar"
+import { Sidebar } from "@/components/sidebar"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Card, CardContent } from "@/components/ui/card"
 import { CheckCircle2, Wallet, ArrowUp, Download } from "lucide-react"
@@ -29,13 +29,13 @@ function MyWalletPageContent() {
     <div className="flex h-screen bg-[#F8FAFC] overflow-hidden">
       {/* Desktop Sidebar */}
       <div className="hidden lg:block h-full">
-        <WalletSidebar />
+        <Sidebar />
       </div>
 
       {/* Mobile Sidebar */}
       <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
         <SheetContent side="left" className="p-0 w-64">
-          <WalletSidebar onClose={() => setIsSidebarOpen(false)} />
+          <Sidebar onClose={() => setIsSidebarOpen(false)} />
         </SheetContent>
       </Sheet>
 
@@ -173,8 +173,8 @@ function MyWalletPageContent() {
                         >
                           <div className="flex items-center gap-3 sm:gap-4 flex-1 w-full sm:w-auto">
                             <div className={`w-10 h-10 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center shrink-0 ${tx.type === 'credit' || tx.type === 'deposit'
-                                ? 'bg-emerald-50'
-                                : 'bg-red-50'
+                              ? 'bg-emerald-50'
+                              : 'bg-red-50'
                               }`}>
                               {tx.type === 'credit' || tx.type === 'deposit' ? '✓' : '✗'}
                             </div>
@@ -187,16 +187,16 @@ function MyWalletPageContent() {
                           </div>
                           <div className="text-right ml-auto sm:ml-0">
                             <p className={`text-base sm:text-sm md:text-base font-bold ${tx.type === 'credit' || tx.type === 'deposit'
-                                ? 'text-emerald-600'
-                                : 'text-red-600'
+                              ? 'text-emerald-600'
+                              : 'text-red-600'
                               }`}>
                               {tx.type === 'credit' || tx.type === 'deposit' ? '+' : '-'}${tx.amount.toFixed(2)}
                             </p>
                             <p className={`text-xs font-semibold ${tx.status === 'completed'
-                                ? 'text-emerald-600'
-                                : tx.status === 'pending'
-                                  ? 'text-orange-600'
-                                  : 'text-red-600'
+                              ? 'text-emerald-600'
+                              : tx.status === 'pending'
+                                ? 'text-orange-600'
+                                : 'text-red-600'
                               }`}>
                               {tx.status.charAt(0).toUpperCase() + tx.status.slice(1)}
                             </p>

@@ -8,10 +8,22 @@
 
 import React, { useState, useEffect } from 'react'
 import { DashboardAPI, DashboardStats, StreakInfo, ContributionStatus } from '@/lib/dashboard-api'
+import dynamic from 'next/dynamic'
 import { Loader2, AlertCircle } from 'lucide-react'
-import { HeroCard } from './enhanced-hero-card'
-import { EnhancedStatCards } from './enhanced-stat-cards'
-import { EnhancedTodayContribution } from './enhanced-today-contribution'
+
+// Lazy load heavy components with skeletons
+const HeroCard = dynamic(() => import('./enhanced-hero-card').then(mod => mod.HeroCard), {
+  loading: () => <div className="w-full h-[300px] bg-slate-100/50 animate-pulse rounded-3xl" />,
+  ssr: false
+})
+const EnhancedStatCards = dynamic(() => import('./enhanced-stat-cards').then(mod => mod.EnhancedStatCards), {
+  loading: () => <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[120px] bg-slate-100/50 animate-pulse rounded-xl" />,
+  ssr: false
+})
+const EnhancedTodayContribution = dynamic(() => import('./enhanced-today-contribution').then(mod => mod.EnhancedTodayContribution), {
+  loading: () => <div className="w-full h-[200px] bg-slate-100/50 animate-pulse rounded-3xl" />,
+  ssr: false
+})
 
 interface DashboardContainerProps {
   userId?: string

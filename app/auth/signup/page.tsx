@@ -250,8 +250,8 @@ export default function SignUpPage() {
                   key={key}
                   onClick={() => setChallengeData({ ...challengeData, selectedChallenge: key })}
                   className={`p-6 rounded-lg border-2 transition-all ${challengeData.selectedChallenge === key
-                      ? "border-teal-600 bg-blue-50"
-                      : "border-gray-200 bg-white hover:border-gray-300"
+                    ? "border-teal-600 bg-blue-50"
+                    : "border-gray-200 bg-white hover:border-gray-300"
                     }`}
                 >
                   <div className="font-bold text-gray-900">{challenge.name}</div>
@@ -301,8 +301,8 @@ export default function SignUpPage() {
                       key={mult}
                       onClick={() => setChallengeData({ ...challengeData, selectedMultiplier: mult })}
                       className={`transition-colors ${challengeData.selectedMultiplier === mult
-                          ? "text-teal-600 font-bold"
-                          : "text-gray-600 hover:text-gray-900"
+                        ? "text-teal-600 font-bold"
+                        : "text-gray-600 hover:text-gray-900"
                         }`}
                     >
                       x{mult}

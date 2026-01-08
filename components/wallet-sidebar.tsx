@@ -153,16 +153,15 @@ export function WalletSidebar({ onClose }: WalletSidebarProps) {
       {/* Header Section - Fixed */}
       <div className="flex-shrink-0 p-3 sm:p-4 md:p-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 min-w-0 flex-1">
-            <img
-              src="/logo.png"
-              alt="Save2740 Logo"
-              className="h-10 sm:h-12 md:h-14 w-auto"
-            />
+          <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
+            <div style={{ width: '140px', height: '56px', overflow: 'hidden' }}>
+              <img
+                src="/logo.png"
+                alt="Save2740 Logo"
+                className="h-10 sm:h-12 md:h-14 w-auto"
+              />
+            </div>
           </div>
-          <button onClick={onClose} className="lg:hidden p-1.5 sm:p-2 text-slate-500 shrink-0 rounded transition-colors">
-            <X className="w-5 h-5 sm:w-5 md:w-6 h-5 md:h-6" />
-          </button>
         </div>
       </div>
 

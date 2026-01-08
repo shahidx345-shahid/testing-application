@@ -23,79 +23,89 @@ import Image from "next/image"
 
 // Custom Dashboard Icon Component
 const DashboardIcon = ({ className }: { className?: string }) => (
-  <img
-    src="/dashboard-icon.png"
-    alt="Dashboard"
-    width={24}
-    height={24}
-    className={className}
-  />
+  <div className={className}>
+    <Image
+      src="/dashboard-icon.png"
+      alt="Dashboard"
+      width={24}
+      height={24}
+      priority
+    />
+  </div>
 )
 
 // Custom Wallet Icon Component
 const WalletIcon = ({ className }: { className?: string }) => (
-  <img
-    src="/wallet-icon.png"
-    alt="Wallet"
-    width={24}
-    height={24}
-    className={className}
-  />
+  <div className={className}>
+    <Image
+      src="/wallet-icon.png"
+      alt="Wallet"
+      width={24}
+      height={24}
+      priority
+    />
+  </div>
 )
 
 // Custom Transaction Icon Component
 const TransactionIcon = ({ className }: { className?: string }) => (
-  <img
-    src="/transaction-icon.png"
-    alt="Transaction"
-    width={24}
-    height={24}
-    className={className}
-  />
+  <div className={className}>
+    <Image
+      src="/transaction-icon.png"
+      alt="Transaction"
+      width={24}
+      height={24}
+      priority
+    />
+  </div>
 )
 
 // Custom Achievements Icon Component
 const AchievementsIcon = ({ className }: { className?: string }) => (
-  <img
-    src="/achievements-icon.png"
-    alt="Achievements"
-    width={24}
-    height={24}
-    className={className}
-  />
+  <div className={className}>
+    <Image
+      src="/achievements-icon.png"
+      alt="Achievements"
+      width={24}
+      height={24}
+    />
+  </div>
 )
 
 // Custom Saver Pockets Icon Component
 const SaverPocketsIcon = ({ className }: { className?: string }) => (
-  <img
-    src="/saver-pockets-icon.png"
-    alt="Saver Pockets"
-    width={24}
-    height={24}
-    className={className}
-  />
+  <div className={className}>
+    <Image
+      src="/saver-pockets-icon.png"
+      alt="Saver Pockets"
+      width={24}
+      height={24}
+    />
+  </div>
 )
 
 // Custom Referrals Icon Component
 const ReferralsIcon = ({ className }: { className?: string }) => (
-  <img
-    src="/referrals-icon.png"
-    alt="Referrals"
-    width={24}
-    height={24}
-    className={className}
-  />
+  <div className={className}>
+    <Image
+      src="/referrals-icon.png"
+      alt="Referrals"
+      width={24}
+      height={24}
+    />
+  </div>
 )
 
 // Custom Subscription Icon Component
 const SubscriptionIcon = ({ className }: { className?: string }) => (
-  <img
-    src="/subscription-icon.png"
-    alt="Subscription"
-    width={24}
-    height={24}
-    className={className}
-  />
+  <div className={className}>
+    <Image
+      src="/subscription-icon.png"
+      alt="Subscription"
+      width={24}
+      height={24}
+    />
+  </div>
 )
 
 // Custom Group Contribution Icon Component (SVG)
@@ -173,21 +183,36 @@ export function Sidebar({ onClose }: SidebarProps) {
       {/* Header Section - Fixed */}
       <div className="flex-shrink-0 p-3 sm:p-4 md:p-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 min-w-0 flex-1">
-            <img
-              src="/logo.png"
-              alt="Save2740 Logo"
-              className="h-10 sm:h-12 md:h-14 w-auto"
-            />
+          <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
+            <div style={{ width: '140px', height: '56px', overflow: 'hidden' }}>
+              <img
+                src="/logo.png"
+                alt="Save2740 Logo"
+                className="h-10 sm:h-12 md:h-14 w-auto"
+              />
+            </div>
           </div>
-          <button onClick={onClose} className="lg:hidden p-1.5 sm:p-2 text-slate-500 shrink-0 rounded transition-colors">
-            <X className="w-5 h-5 sm:w-5 md:w-6 h-5 md:h-6" />
-          </button>
         </div>
       </div>
 
       {/* Navigation - Scrollable */}
-      <nav className="flex-1 overflow-y-auto hide-scrollbar px-3 sm:px-4 md:px-6 space-y-0.5 sm:space-y-1 md:space-y-2 pb-4">
+      <nav
+        id="sidebar-nav"
+        className="flex-1 overflow-y-auto hide-scrollbar px-3 sm:px-4 md:px-6 space-y-0.5 sm:space-y-1 md:space-y-2 pb-4"
+        onScroll={(e) => {
+          const target = e.target as HTMLElement;
+          sessionStorage.setItem('sidebar-scroll', target.scrollTop.toString());
+        }}
+        ref={(el) => {
+          if (el) {
+            // Restore scroll position immediately on mount
+            const savedScroll = sessionStorage.getItem('sidebar-scroll');
+            if (savedScroll) {
+              el.scrollTop = parseInt(savedScroll, 10);
+            }
+          }
+        }}
+      >
         {navItems.map((item, index) => {
           const isActive = pathname === item.href
           return (
@@ -248,7 +273,7 @@ export function Sidebar({ onClose }: SidebarProps) {
               prefetch={true}
               className="flex items-center px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-slate-600 hover:text-brand-green transition-colors"
             >
-              Subscription & refund policy
+              Subscription & Refund Policy
             </Link>
             <Link
               href="/affiliate-referral-policy"
@@ -256,7 +281,7 @@ export function Sidebar({ onClose }: SidebarProps) {
               prefetch={true}
               className="flex items-center px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-slate-600 hover:text-brand-green transition-colors"
             >
-              Affiliate / referral policy
+              Affiliate / Referral Policy
             </Link>
           </div>
         </div>

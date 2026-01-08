@@ -2,7 +2,7 @@
 
 import { ProtectedPage } from "@/components/protected-page"
 import { DashboardHeader } from "@/components/dashboard-header"
-import { WalletSidebar } from "@/components/wallet-sidebar"
+import { Sidebar } from "@/components/sidebar"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { useState } from "react"
 import { Download, ChevronLeft, ChevronRight } from "lucide-react"
@@ -109,13 +109,13 @@ function WalletTransactionsPageContent() {
     <div className="flex h-screen bg-[#F8FAFC] overflow-hidden">
       {/* Desktop Sidebar */}
       <div className="hidden lg:block h-full">
-        <WalletSidebar />
+        <Sidebar />
       </div>
 
       {/* Mobile Sidebar */}
       <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
         <SheetContent side="left" className="p-0 w-64">
-          <WalletSidebar onClose={() => setIsSidebarOpen(false)} />
+          <Sidebar onClose={() => setIsSidebarOpen(false)} />
         </SheetContent>
       </Sheet>
 

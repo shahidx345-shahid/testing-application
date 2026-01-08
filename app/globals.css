@@ -768,6 +768,65 @@
   animation-delay: 2s;
 }
 
+
 .animation-delay-4000 {
   animation-delay: 4s;
+}
+
+/* ===================================
+   PROSE CUSTOMIZATION FOR CONTENT PAGES
+   Match app's professional typography
+   =================================== */
+.prose {
+  max-width: none;
+}
+
+.prose h2 {
+  @apply text-xl font-bold text-slate-900 mb-4 mt-8 first:mt-0;
+}
+
+.prose h3 {
+  @apply text-lg font-semibold text-slate-900 mb-3 mt-6;
+}
+
+.prose h4 {
+  @apply text-base font-semibold text-slate-900 mb-2 mt-4;
+}
+
+.prose p {
+  @apply text-sm md:text-base text-slate-600 mb-4 leading-relaxed;
+}
+
+.prose ul,
+.prose ol {
+  @apply text-sm md:text-base text-slate-600 space-y-2 mb-4;
+}
+
+.prose li {
+  @apply text-sm md:text-base text-slate-700 leading-relaxed;
+}
+
+.prose strong {
+  @apply font-semibold text-slate-900;
+}
+
+.prose a {
+  @apply text-brand-green hover:underline font-medium;
+}
+
+.prose code {
+  @apply bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded text-sm;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-brand-green pl-4 italic text-slate-600;
+}
+
+/* Remove default prose margins for better control */
+.prose :first-child {
+  margin-top: 0;
+}
+
+.prose :last-child {
+  margin-bottom: 0;
 }
