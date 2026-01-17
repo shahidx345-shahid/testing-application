@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { usePathname } from "next/navigation"
 import { Bell, Menu } from "lucide-react"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 
@@ -8,6 +9,26 @@ interface DashboardHeaderProps {
   title?: string
   onMenuClick?: () => void
 }
+
+// Sidebar navigation items - must match sidebar.tsx
+const navItems = [
+  { label: "Dashboard", href: "/", isDashboard: true },
+  { label: "My Wallet", href: "/my-wallet", isWallet: true },
+  { label: "Saver Pockets", href: "/saver-pockets" },
+  { label: "Group Contribution", href: "/group-contribution" },
+  { label: "Referrals", href: "/referrals" },
+  { label: "My Transactions", href: "/wallet-transactions" },
+  { label: "Subscription", href: "/subscription" },
+]
+
+// Useful Links - must match sidebar.tsx
+const usefulLinks = [
+  { label: "Privacy Policy", href: "/privacy-policy" },
+  { label: "Terms & Conditions", href: "/terms-conditions" },
+  { label: "Savings Challenge Disclaimer", href: "/savings-challenge-disclaimer" },
+  { label: "Subscription & Refund Policy", href: "/subscription-refund-policy" },
+  { label: "Affiliate / Referral Policy", href: "/affiliate-referral-policy" },
+]
 
 interface Notification {
   _id: string
@@ -19,9 +40,29 @@ interface Notification {
 }
 
 export function DashboardHeader({ title = "Dashboard", onMenuClick }: DashboardHeaderProps) {
+  const pathname = usePathname()
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loading, setLoading] = useState(true)
+
+  // Get active page label from sidebar items or useful links
+  const getActivePageLabel = () => {
+    // Check main nav items first
+    const activeNavItem = navItems.find(item => {
+      if (item.isDashboard && pathname === "/") return true
+      return pathname === item.href
+    })
+    if (activeNavItem) return activeNavItem.label
+
+    // Check useful links
+    const activeLink = usefulLinks.find(link => pathname === link.href)
+    if (activeLink) return activeLink.label
+
+    // Fallback to title prop
+    return title
+  }
+
+  const activePageLabel = getActivePageLabel()
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -55,7 +96,11 @@ export function DashboardHeader({ title = "Dashboard", onMenuClick }: DashboardH
               <button onClick={onMenuClick} className="lg:hidden p-1.5 sm:p-2 -ml-1.5 sm:-ml-2 text-slate-600 shrink-0 rounded transition-colors">
                 <Menu className="w-5 h-5 sm:w-5 md:w-6 h-5 md:h-6" />
               </button>
-              <h1 className="text-xl sm:text-2xl md:text-2xl lg:text-3xl font-bold text-slate-800 truncate">{title}</h1>
+              {/* On mobile, show active page label from sidebar; on desktop, show title prop */}
+              <h1 className="text-base sm:text-lg md:text-xl lg:text-3xl font-bold text-slate-800 truncate flex-1 min-w-0">
+                <span className="lg:hidden block">{activePageLabel}</span>
+                <span className="hidden lg:inline">{title}</span>
+              </h1>
             </div>
 
             {/* Right side - Controls */}
@@ -105,7 +150,7 @@ export function DashboardHeader({ title = "Dashboard", onMenuClick }: DashboardH
               <div className="divide-y divide-slate-100">
                 {notifications.map((notification) => (
                   <div
-                    key={notification.id}
+                    key={notification._id}
                     className={`p-4 hover:bg-slate-50 transition-colors cursor-pointer ${!notification.read ? 'bg-emerald-50/50' : ''
                       }`}
                   >
