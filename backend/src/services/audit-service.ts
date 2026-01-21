@@ -3,8 +3,8 @@
  * Logging for compliance and security
  */
 
-import { AuditLog } from '@/lib/models/audit-log';
-import { connectDB } from '@/lib/db';
+import { AuditLog } from '@/models/audit-log';
+import { connectDB } from '@/config/db';
 
 export interface AuditLogEntry {
   userId?: string;

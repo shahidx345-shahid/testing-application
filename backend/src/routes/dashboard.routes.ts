@@ -1,6 +1,7 @@
-﻿import express, { Response } from 'express';
+import express, { Response } from 'express';
 import { Wallet } from '../models/wallet.model';
 import { User } from '../models/auth.model';
+import { Transaction } from '../models/transaction.model';
 import { connectDB } from '../config/db';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
 
@@ -125,7 +126,32 @@ router.get('/achievements', authenticateToken, async (req: AuthRequest, res: Res
   }
 });
 
-// GET /api/dashboard/savings-breakdown
+// GET /api/dashboard/breakdown (alias for savings-breakdown)
+router.get('/breakdown', authenticateToken, async (req: AuthRequest, res: Response) => {
+  try {
+    await connectDB();
+
+    const wallet = await Wallet.findOne({ userId: req.userId });
+
+    res.json({
+      success: true,
+      data: {
+        available: wallet?.availableBalance || 0,
+        locked: wallet?.locked || 0,
+        inPockets: wallet?.lockedInPockets || 0,
+        total: wallet?.balance || 0
+      }
+    });
+  } catch (error) {
+    console.error('Dashboard breakdown error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get savings breakdown'
+    });
+  }
+});
+
+// GET /api/dashboard/savings-breakdown (same as /breakdown)
 router.get('/savings-breakdown', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     await connectDB();
@@ -196,6 +222,98 @@ router.get('/projections', authenticateToken, async (req: AuthRequest, res: Resp
     res.status(500).json({
       success: false,
       error: 'Failed to get projections'
+    });
+  }
+});
+
+// POST /api/dashboard/contribution - Process manual contribution
+router.post('/contribution', authenticateToken, async (req: AuthRequest, res: Response) => {
+  try {
+    await connectDB();
+    const { amount, paymentMethodId, planId } = req.body;
+
+    if (!amount || amount <= 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Valid amount is required'
+      });
+    }
+
+    const wallet = await Wallet.findOne({ userId: req.userId });
+    if (!wallet) {
+      return res.status(404).json({
+        success: false,
+        error: 'Wallet not found'
+      });
+    }
+
+    // Check if already contributed today
+    const today = new Date().toISOString().split('T')[0];
+    const lastSaveDate = wallet.lastSaveDate ? new Date(wallet.lastSaveDate).toISOString().split('T')[0] : null;
+    
+    if (lastSaveDate === today) {
+      return res.status(400).json({
+        success: false,
+        error: 'Already contributed today'
+      });
+    }
+
+    // Create transaction
+    const transaction = await Transaction.create({
+      userId: req.userId,
+      type: 'deposit',
+      amount,
+      description: 'Daily savings contribution',
+      status: 'completed',
+      metadata: {
+        source: 'manual_contribution',
+        planId: planId || null,
+        paymentMethodId: paymentMethodId || null
+      }
+    });
+
+    // Update wallet
+    wallet.balance += amount;
+    wallet.availableBalance += amount;
+    wallet.lastSaveDate = new Date();
+
+    // Update streak
+    if (lastSaveDate) {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = yesterday.toISOString().split('T')[0];
+      
+      if (lastSaveDate === yesterdayStr) {
+        wallet.currentStreak = (wallet.currentStreak || 0) + 1;
+        if (wallet.currentStreak > (wallet.longestStreak || 0)) {
+          wallet.longestStreak = wallet.currentStreak;
+        }
+      } else {
+        wallet.currentStreak = 1;
+      }
+    } else {
+      wallet.currentStreak = 1;
+      wallet.longestStreak = 1;
+    }
+
+    await wallet.save();
+
+    res.json({
+      success: true,
+      data: {
+        transactionId: transaction._id,
+        amount,
+        newBalance: wallet.balance,
+        streakUpdated: true,
+        newStreak: wallet.currentStreak
+      }
+    });
+
+  } catch (error) {
+    console.error('Process contribution error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to process contribution'
     });
   }
 });

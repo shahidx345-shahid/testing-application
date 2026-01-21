@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import { API } from '@/lib/constants'
 
 export interface Group {
   id: string
@@ -59,8 +60,12 @@ export function useGroups(): UseGroupsReturn {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch('/api/groups', {
+      const response = await fetch(`${API.BASE_URL}/api/groups`, {
         method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${typeof window !== 'undefined' ? localStorage.getItem('token') || '' : ''}`,
+        },
         credentials: 'include',
       })
 
@@ -88,11 +93,12 @@ export function useGroups(): UseGroupsReturn {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch('/api/groups', {
+      const response = await fetch(`${API.BASE_URL}/api/groups`, {
         method: 'POST',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${typeof window !== 'undefined' ? localStorage.getItem('token') || '' : ''}`,
         },
         body: JSON.stringify(formData),
       })
@@ -122,8 +128,12 @@ export function useGroups(): UseGroupsReturn {
     setError(null)
     try {
       // First, find the group with this referral code
-      const groupResponse = await fetch('/api/groups', {
+      const groupResponse = await fetch(`${API.BASE_URL}/api/groups`, {
         method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${typeof window !== 'undefined' ? localStorage.getItem('token') || '' : ''}`,
+        },
         credentials: 'include',
       })
 
@@ -139,11 +149,12 @@ export function useGroups(): UseGroupsReturn {
       }
 
       // Then, join the group
-      const response = await fetch(`/api/groups/${targetGroup.id}/join`, {
+      const response = await fetch(`${API.BASE_URL}/api/groups/${targetGroup.id}/join`, {
         method: 'POST',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${typeof window !== 'undefined' ? localStorage.getItem('token') || '' : ''}`,
         },
         body: JSON.stringify({ referralCode, referredBy }),
       })
@@ -175,11 +186,12 @@ export function useGroups(): UseGroupsReturn {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch(`/api/groups/${groupId}/contribute`, {
+      const response = await fetch(`${API.BASE_URL}/api/groups/${groupId}/contribute`, {
         method: 'POST',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${typeof window !== 'undefined' ? localStorage.getItem('token') || '' : ''}`,
         },
         body: JSON.stringify({
           amount,
@@ -210,8 +222,12 @@ export function useGroups(): UseGroupsReturn {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch(`/api/groups/${groupId}/contribute`, {
+      const response = await fetch(`${API.BASE_URL}/api/groups/${groupId}/contribute`, {
         method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${typeof window !== 'undefined' ? localStorage.getItem('token') || '' : ''}`,
+        },
         credentials: 'include',
       })
 

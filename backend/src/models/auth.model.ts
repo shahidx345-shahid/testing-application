@@ -15,6 +15,24 @@ export interface IUser extends Document {
   referralCode?: string;
   referredBy?: string;
   accountTier?: 'basic' | 'pro' | 'business';
+  dateOfBirth?: Date;
+  bio?: string;
+  address?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
+  };
+  preferences?: {
+    currency?: string;
+    language?: string;
+    notifications?: {
+      email: boolean;
+      push: boolean;
+      sms: boolean;
+    }
+  };
   biometricEnabled: boolean;
   biometricCredentials?: {
     credentialId: string;
@@ -116,6 +134,30 @@ const UserSchema = new Schema<IUser>(
       enum: ["basic", "pro", "business"],
       default: "basic",
     },
+    dateOfBirth: Date,
+    bio: {
+      type: String,
+      trim: true,
+      maxlength: 500
+    },
+    address: {
+      street: String,
+      city: String,
+      state: String,
+      postalCode: String,
+      country: String
+    },
+    preferences: {
+      currency: { type: String, default: 'USD' },
+      language: { type: String, default: 'en' },
+      notifications: {
+        email: { type: Boolean, default: true },
+        push: { type: Boolean, default: true },
+        sms: { type: Boolean, default: false },
+        marketing: { type: Boolean, default: true },
+        security: { type: Boolean, default: true }
+      }
+    }
   },
   { timestamps: true }
 );

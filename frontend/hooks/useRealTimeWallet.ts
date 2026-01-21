@@ -12,6 +12,7 @@
  */
 
 import { useEffect, useState, useCallback, useRef } from 'react'
+import { API } from '@/lib/constants'
 
 export interface WalletData {
   balance: number
@@ -60,8 +61,11 @@ export function useRealTimeWallet(options: UseRealTimeWalletOptions = {}) {
       abortControllerRef.current = new AbortController()
       const token = localStorage.getItem('token')
 
-      const response = await fetch('/api/wallet', {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      const response = await fetch(`${API.BASE_URL}/api/wallet`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
         signal: abortControllerRef.current.signal,
       })
 

@@ -5,10 +5,10 @@ const getTransporter = () => {
   const emailUser = process.env.SMTP_USER || process.env.EMAIL_USER;
   const emailPass = process.env.SMTP_PASSWORD || process.env.EMAIL_PASSWORD;
   const smtpHost = process.env.SMTP_HOST;
-  
+
   // Detect Gmail: if EMAIL_SERVICE is gmail, or SMTP_HOST contains gmail, or no SMTP_HOST set
-  const isGmail = 
-    process.env.EMAIL_SERVICE === 'gmail' || 
+  const isGmail =
+    process.env.EMAIL_SERVICE === 'gmail' ||
     smtpHost?.toLowerCase().includes('gmail') ||
     emailUser?.toLowerCase().endsWith('@gmail.com') ||
     !smtpHost;
@@ -46,12 +46,12 @@ function getFromEmail(): string {
   const emailUser = process.env.SMTP_USER || process.env.EMAIL_USER;
   const smtpFrom = process.env.SMTP_FROM;
   const isGmailAccount = emailUser?.toLowerCase().endsWith('@gmail.com');
-  
+
   // If using Gmail and SMTP_FROM is not a Gmail address, use the Gmail account
   if (isGmailAccount && smtpFrom && !smtpFrom.toLowerCase().endsWith('@gmail.com')) {
     return emailUser!;
   }
-  
+
   // Otherwise use SMTP_FROM if set, or fall back to emailUser
   return smtpFrom || emailUser || "noreply@save2740.com";
 }
@@ -66,7 +66,7 @@ export async function sendVerificationEmail(
   try {
     const emailUser = process.env.SMTP_USER || process.env.EMAIL_USER;
     const emailPass = process.env.SMTP_PASSWORD || process.env.EMAIL_PASSWORD;
-    
+
     if (!emailUser || !emailPass) {
       console.warn("[EMAIL] SMTP credentials not configured. Skipping email send.")
       return false
@@ -111,7 +111,7 @@ export async function sendWelcomeEmail(
   try {
     const emailUser = process.env.SMTP_USER || process.env.EMAIL_USER;
     const emailPass = process.env.SMTP_PASSWORD || process.env.EMAIL_PASSWORD;
-    
+
     if (!emailUser || !emailPass) {
       console.warn("[EMAIL] SMTP credentials not configured. Skipping email send.")
       return false
@@ -133,7 +133,7 @@ export async function sendWelcomeEmail(
             <li>Join our community</li>
           </ul>
           <p style="margin-top: 20px;">
-            <a href="${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3001"}" style="background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+            <a href="${process.env.FRONTEND_URL || "http://localhost:3000"}" style="background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
               Get Started
             </a>
           </p>
@@ -164,7 +164,7 @@ export async function sendPasswordResetEmail(
   try {
     const emailUser = process.env.SMTP_USER || process.env.EMAIL_USER;
     const emailPass = process.env.SMTP_PASSWORD || process.env.EMAIL_PASSWORD;
-    
+
     if (!emailUser || !emailPass) {
       console.warn("[EMAIL] SMTP credentials not configured. Skipping email send.")
       return false
@@ -210,7 +210,7 @@ export async function sendPasswordResetOTP(
   try {
     const emailUser = process.env.SMTP_USER || process.env.EMAIL_USER;
     const emailPass = process.env.SMTP_PASSWORD || process.env.EMAIL_PASSWORD;
-    
+
     if (!emailUser || !emailPass) {
       console.warn("[EMAIL] SMTP credentials not configured. Skipping email send.")
       return false
@@ -244,7 +244,7 @@ export async function sendPasswordResetOTP(
   } catch (error: any) {
     // Don't fail the request if email sending fails - OTP is still generated
     console.error(`[EMAIL] Failed to send password reset OTP to ${email}:`, error.message || error)
-    
+
     // Log helpful error message for Gmail
     if (error.code === 'EAUTH' || error.responseCode === 535) {
       console.error(`[EMAIL] Gmail authentication failed. Please check:`)
@@ -253,7 +253,7 @@ export async function sendPasswordResetOTP(
       console.error(`  3. Verify SMTP_USER and SMTP_PASSWORD in .env.local`)
       console.error(`  4. Generate App Password: https://myaccount.google.com/apppasswords`)
     }
-    
+
     // Return true so the API doesn't fail - OTP is still generated and stored
     return false
   }
@@ -262,7 +262,7 @@ export async function sendPasswordResetOTP(
 /**
  * Generic email send function
  */
-async function sendEmail(options: {
+export async function sendEmail(options: {
   to: string
   subject: string
   html: string
@@ -271,7 +271,7 @@ async function sendEmail(options: {
   try {
     const emailUser = process.env.SMTP_USER || process.env.EMAIL_USER;
     const emailPass = process.env.SMTP_PASSWORD || process.env.EMAIL_PASSWORD;
-    
+
     if (!emailUser || !emailPass) {
       console.warn("[EMAIL] SMTP credentials not configured. Skipping email send.")
       return false

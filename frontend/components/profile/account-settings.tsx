@@ -1,13 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useProfile } from "@/hooks/use-profile";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Bell, Mail, MessageSquare, Shield, Globe, DollarSign } from "lucide-react";
+import { Bell, Mail, MessageSquare, Shield, Globe, Loader2 } from "lucide-react";
+import { API } from "@/lib/constants";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export function AccountSettings() {
+    const { profile, refetch } = useProfile();
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
     const [settings, setSettings] = useState({
         emailNotifications: true,
         smsNotifications: false,
@@ -15,14 +22,98 @@ export function AccountSettings() {
         twoFactorAuth: false,
         marketingEmails: true,
         securityAlerts: true,
+        language: "English",
+        currency: "USD"
     });
 
-    const handleToggle = (key: string) => {
-        setSettings({ ...settings, [key]: !settings[key as keyof typeof settings] });
+    useEffect(() => {
+        if (profile?.preferences) {
+            setSettings(prev => ({
+                ...prev,
+                emailNotifications: profile.preferences?.notifications?.email ?? true,
+                smsNotifications: profile.preferences?.notifications?.sms ?? false,
+                pushNotifications: profile.preferences?.notifications?.push ?? true,
+                marketingEmails: profile.preferences?.notifications?.marketing ?? true,
+                securityAlerts: profile.preferences?.notifications?.security ?? true,
+                language: profile.preferences?.language || "English",
+                currency: profile.preferences?.currency || "USD"
+            }));
+        }
+        // Map 2FA separately since it's likely on the user root or not yet implemented backend-side
+        // For now, we'll keep it local defaults or map if available
+    }, [profile]);
+
+    const saveSettings = async (newSettings: typeof settings) => {
+        setMessage(null);
+        setLoading(true);
+
+        // Map settings to API structure
+        const apiData = {
+            preferences: {
+                notifications: {
+                    email: newSettings.emailNotifications,
+                    sms: newSettings.smsNotifications,
+                    push: newSettings.pushNotifications,
+                    marketing: newSettings.marketingEmails,
+                    security: newSettings.securityAlerts
+                },
+                language: newSettings.language,
+                currency: newSettings.currency
+            }
+        };
+
+        try {
+            const response = await fetch(`${API.BASE_URL}/api/profile`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem('token') || ''}`
+                },
+                body: JSON.stringify(apiData),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to save settings");
+            }
+
+            refetch();
+            setMessage({ type: 'success', text: 'Settings saved successfully' });
+
+            // Clear success message after 3 seconds
+            setTimeout(() => setMessage(null), 3000);
+
+        } catch (error) {
+            console.error(error);
+            setMessage({ type: 'error', text: 'Failed to save settings' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleToggle = (key: keyof typeof settings) => {
+        const newSettings = { ...settings, [key]: !settings[key] };
+        setSettings(newSettings);
+        saveSettings(newSettings); // Auto-save on toggle
+    };
+
+    const handleChange = (key: string, value: string) => {
+        setSettings(prev => ({ ...prev, [key]: value }));
+    };
+
+    const handleSavePreferences = () => {
+        saveSettings(settings); // Explicit save for dropdowns
     };
 
     return (
         <div className="space-y-6 animate-fade-in">
+            {message && (
+                <Alert className={message.type === 'success' ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50"}>
+                    <AlertDescription className={message.type === 'success' ? "text-green-700" : "text-red-700"}>
+                        {message.text}
+                    </AlertDescription>
+                </Alert>
+            )}
+
             {/* Notifications */}
             <Card className="border-0 bg-white rounded-2xl sm:rounded-3xl shadow-lg">
                 <CardHeader className="px-4 sm:px-6">
@@ -45,6 +136,7 @@ export function AccountSettings() {
                             id="email"
                             checked={settings.emailNotifications}
                             onCheckedChange={() => handleToggle("emailNotifications")}
+                            disabled={loading}
                             className="shrink-0 scale-75 sm:scale-100 origin-right data-[state=checked]:bg-brand-green"
                         />
                     </div>
@@ -61,6 +153,7 @@ export function AccountSettings() {
                             id="sms"
                             checked={settings.smsNotifications}
                             onCheckedChange={() => handleToggle("smsNotifications")}
+                            disabled={loading}
                             className="shrink-0 scale-75 sm:scale-100 origin-right data-[state=checked]:bg-brand-green"
                         />
                     </div>
@@ -77,6 +170,7 @@ export function AccountSettings() {
                             id="push"
                             checked={settings.pushNotifications}
                             onCheckedChange={() => handleToggle("pushNotifications")}
+                            disabled={loading}
                             className="shrink-0 scale-75 sm:scale-100 origin-right data-[state=checked]:bg-brand-green"
                         />
                     </div>
@@ -93,6 +187,7 @@ export function AccountSettings() {
                             id="marketing"
                             checked={settings.marketingEmails}
                             onCheckedChange={() => handleToggle("marketingEmails")}
+                            disabled={loading}
                             className="shrink-0 scale-75 sm:scale-100 origin-right data-[state=checked]:bg-brand-green"
                         />
                     </div>
@@ -121,8 +216,10 @@ export function AccountSettings() {
                             id="2fa"
                             checked={settings.twoFactorAuth}
                             onCheckedChange={() => handleToggle("twoFactorAuth")}
+                            disabled={true} // Disabled for now as it requires complex backend implementation
                             className="shrink-0 scale-75 sm:scale-100 origin-right data-[state=checked]:bg-brand-green"
                         />
+                        {/* <Badge>Coming Soon</Badge> would be nice here */}
                     </div>
 
                     <div className="flex flex-row items-center justify-between gap-2 p-2.5 sm:p-4 bg-gray-50 rounded-xl">
@@ -137,6 +234,7 @@ export function AccountSettings() {
                             id="security"
                             checked={settings.securityAlerts}
                             onCheckedChange={() => handleToggle("securityAlerts")}
+                            disabled={loading}
                             className="shrink-0 scale-75 sm:scale-100 origin-right data-[state=checked]:bg-brand-green"
                         />
                     </div>
@@ -159,24 +257,37 @@ export function AccountSettings() {
                 <CardContent className="space-y-3 sm:space-y-4 px-4 sm:px-6">
                     <div className="space-y-2">
                         <Label>Language</Label>
-                        <select className="w-full border border-gray-300 rounded-lg px-4 py-2.5 bg-white">
-                            <option>English</option>
-                            <option>Spanish</option>
-                            <option>French</option>
+                        <select
+                            className="w-full border border-gray-300 rounded-lg px-4 py-2.5 bg-white"
+                            value={settings.language}
+                            onChange={(e) => handleChange("language", e.target.value)}
+                        >
+                            <option value="English">English</option>
+                            <option value="Spanish">Spanish</option>
+                            <option value="French">French</option>
                         </select>
                     </div>
 
                     <div className="space-y-2">
                         <Label>Currency</Label>
-                        <select className="w-full border border-gray-300 rounded-lg px-4 py-2.5 bg-white">
-                            <option>USD ($)</option>
-                            <option>EUR (€)</option>
-                            <option>GBP (£)</option>
+                        <select
+                            className="w-full border border-gray-300 rounded-lg px-4 py-2.5 bg-white"
+                            value={settings.currency}
+                            onChange={(e) => handleChange("currency", e.target.value)}
+                        >
+                            <option value="USD">USD ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="GBP">GBP (£)</option>
                         </select>
                     </div>
 
                     <div className="pt-4">
-                        <Button className="w-full md:w-auto bg-brand-green hover:bg-brand-green/90">
+                        <Button
+                            className="w-full md:w-auto bg-brand-green hover:bg-brand-green/90"
+                            onClick={handleSavePreferences}
+                            disabled={loading}
+                        >
+                            {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                             Save Preferences
                         </Button>
                     </div>

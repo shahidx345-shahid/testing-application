@@ -3,9 +3,9 @@
  * Core logic for $27.40/day challenge calculations and projections
  */
 
-import { Save2740Plan } from '@/lib/models/save2740.model';
-import { DailyContribution } from '@/lib/models/DailyContribution';
-import { connectDB } from '@/lib/db';
+import { Save2740Plan } from '@/models/save2740.model';
+import { DailyContribution } from '@/models/DailyContribution';
+import { connectDB } from '@/config/db';
 
 export const DAILY_CHALLENGE_AMOUNT = 27.4; // $27.40/day
 export const YEARLY_TARGET = 10000; // ~$10,000/year
@@ -55,7 +55,7 @@ export async function calculateProjections(planId: string): Promise<Save2740Proj
   // Calculate average daily contribution
   const averageDailyContribution =
     contributions.length > 0
-      ? contributions.reduce((sum, c) => sum + c.amount / 100, 0) / contributions.length
+      ? contributions.reduce((sum: number, c: any) => sum + c.amount / 100, 0) / contributions.length
       : 0;
 
   // Calculate projections
@@ -131,24 +131,24 @@ export async function recordDailyContribution(
   // Create or update daily contribution
   const contribution = existingContribution
     ? await DailyContribution.findByIdAndUpdate(
-        existingContribution._id,
-        {
-          amount: Math.round(amount * 100), // Store in cents
-          status: 'completed',
-          completedAt: new Date(),
-          paymentMethodId,
-        },
-        { new: true }
-      )
-    : await DailyContribution.create({
-        userId,
-        planId,
-        date: today,
-        amount: Math.round(amount * 100),
+      existingContribution._id,
+      {
+        amount: Math.round(amount * 100), // Store in cents
         status: 'completed',
         completedAt: new Date(),
         paymentMethodId,
-      });
+      },
+      { new: true }
+    )
+    : await DailyContribution.create({
+      userId,
+      planId,
+      date: today,
+      amount: Math.round(amount * 100),
+      status: 'completed',
+      completedAt: new Date(),
+      paymentMethodId,
+    });
 
   // Update plan
   plan.currentBalance += amount;
@@ -198,18 +198,18 @@ export async function getUserSave2740Stats(userId: string) {
   await connectDB();
 
   const plans = await Save2740Plan.find({ userId });
-  const activePlans = plans.filter((p) => p.status === 'active');
-  const completedPlans = plans.filter((p) => p.status === 'completed');
+  const activePlans = plans.filter((p: any) => p.status === 'active');
+  const completedPlans = plans.filter((p: any) => p.status === 'completed');
 
-  const totalSaved = plans.reduce((sum, p) => sum + p.currentBalance, 0);
-  const totalTarget = plans.reduce((sum, p) => sum + p.totalTargetAmount, 0);
-  const totalContributions = plans.reduce((sum, p) => sum + p.contributionCount, 0);
+  const totalSaved = plans.reduce((sum: number, p: any) => sum + p.currentBalance, 0);
+  const totalTarget = plans.reduce((sum: number, p: any) => sum + p.totalTargetAmount, 0);
+  const totalContributions = plans.reduce((sum: number, p: any) => sum + p.contributionCount, 0);
 
   // Get longest streak across all plans
-  const longestStreak = Math.max(...plans.map((p) => p.longestStreak), 0);
+  const longestStreak = Math.max(...plans.map((p: any) => p.longestStreak), 0);
 
   // Get current streak (from most recent contribution)
-  const currentStreak = Math.max(...activePlans.map((p) => p.streakDays), 0);
+  const currentStreak = Math.max(...activePlans.map((p: any) => p.streakDays), 0);
 
   return {
     totalPlans: plans.length,

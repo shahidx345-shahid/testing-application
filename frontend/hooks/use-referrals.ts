@@ -15,11 +15,7 @@ export interface ReferralData {
     pendingEarnings: number;
 }
 
-interface ApiResponse {
-    success: boolean;
-    data?: ReferralData;
-    error?: string;
-}
+
 
 export function useReferrals() {
     const [data, setData] = useState<ReferralData | null>(null);
@@ -31,18 +27,26 @@ export function useReferrals() {
             setLoading(true);
             setError(null);
 
-            const response = await fetch('/api/referrals', {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
+            const response = await apiClient.get<{
+                referralCode: string;
+                totalReferrals: number;
+                totalEarnings: number;
+                pendingEarnings: number;
+            }>('/api/referrals/stats');
 
-            const result: ApiResponse = await response.json();
-
-            if (result.success && result.data) {
-                setData(result.data);
+            if (response.success && response.data) {
+                // Map backend response to frontend ReferralData interface
+                const mappedData: ReferralData = {
+                    referralCode: response.data.referralCode,
+                    referralLink: `${typeof window !== 'undefined' ? window.location.origin : ''}/signup?ref=${response.data.referralCode}`,
+                    friendsInvited: response.data.totalReferrals,
+                    qualifiedReferrals: response.data.totalReferrals, // Assuming all are qualified for now
+                    totalEarnings: response.data.totalEarnings,
+                    pendingEarnings: response.data.pendingEarnings,
+                };
+                setData(mappedData);
             } else {
-                setError(result.error || 'Failed to fetch referral data');
+                setError(response.error?.error || 'Failed to fetch referral data');
             }
         } catch (err) {
             console.error('[useReferrals] Error:', err);

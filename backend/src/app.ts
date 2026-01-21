@@ -30,21 +30,48 @@ import bankingRoutes from './routes/banking.routes';
 
 // Middleware
 import { errorHandler } from './middleware/error-handler';
-// import mongoSanitize from 'express-mongo-sanitize';
+import {
+    requestId,
+    securityHeaders,
+    xssProtection,
+    preventInjection,
+    sanitizeBodyMiddleware,
+    auditLog
+} from './middleware/security';
 import hpp from 'hpp';
 import cookieParser from 'cookie-parser';
 
 const app: Application = express();
 
+// Request ID for tracking
+app.use(requestId);
+
 // Security middleware
 app.use(helmet());
-// app.use(mongoSanitize()); // Prevent NoSQL injection
+app.use(securityHeaders);
+app.use(xssProtection);
 app.use(hpp()); // Prevent HTTP Parameter Pollution
 app.use(cookieParser()); // Parse cookies
 
-// CORS configuration
+// CORS configuration - UPDATED FOR VERCEL
+const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    'http://localhost:3000',
+    'https://save-2740-frrontend.vercel.app',
+    // Add your Vercel frontend domain here
+].filter(Boolean);
+
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: function (origin, callback) {
+        // Allow requests with no origin (mobile apps, curl, etc)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -53,6 +80,13 @@ app.use(cors({
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Security: Input sanitization and injection prevention
+app.use(sanitizeBodyMiddleware);
+app.use(preventInjection);
+
+// Audit logging for sensitive operations
+app.use(auditLog);
 
 // Compression middleware
 app.use(compression());
@@ -64,11 +98,13 @@ if (process.env.NODE_ENV === 'development') {
     app.use(morgan('combined'));
 }
 
-// Rate limiting
+// Rate limiting - ADJUSTED FOR SERVERLESS
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
-    message: 'Too many requests from this IP, please try again later.'
+    max: process.env.NODE_ENV === 'development' ? 5000 : 100, // limit each IP to 100 requests per windowMs (5000 in dev)
+    message: 'Too many requests from this IP, please try again later.',
+    standardHeaders: true,
+    legacyHeaders: false,
 });
 
 app.use('/api/', limiter);
@@ -122,12 +158,14 @@ app.use('/api/save2740', save2740Routes);
 app.use('/api/saver-pockets', saverPocketsRoutes);
 app.use('/api/payments', paymentsRoutes);
 app.use('/api/payment-methods', paymentMethodsRoutes);
+app.use('/api/payments/methods', paymentMethodsRoutes); // Alias for frontend compatibility
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/fees', feesRoutes);
 app.use('/api/kyc', kycRoutes);
 app.use('/api/support', supportRoutes);
 app.use('/api/support-chat', supportChatRoutes);
 app.use('/api/account', accountRoutes);
+app.use('/api/user', accountRoutes); // Alias for account routes (delete-account)
 app.use('/api/daily-savings', dailySavingsRoutes);
 app.use('/api/quote-of-day', quoteOfDayRoutes);
 app.use('/api/health', healthRoutes);
@@ -145,4 +183,6 @@ app.use((req: Request, res: Response) => {
 // Error handling middleware
 app.use(errorHandler);
 
+// VERCEL SERVERLESS EXPORT
+// This is crucial for Vercel deployment
 export default app;

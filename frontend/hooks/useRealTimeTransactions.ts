@@ -11,6 +11,7 @@
  */
 
 import { useEffect, useState, useCallback, useRef } from 'react'
+import { API } from '@/lib/constants'
 
 export interface Transaction {
   id: string
@@ -55,7 +56,7 @@ export function useRealTimeTransactions(options: UseRealTimeTransactionsOptions 
       abortControllerRef.current = new AbortController()
       const token = localStorage.getItem('token')
 
-      const response = await fetch('/api/wallet/transactions', {
+      const response = await fetch(`${API.BASE_URL}/api/wallet/transactions`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         signal: abortControllerRef.current.signal,
       })

@@ -1,24 +1,29 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useProfile } from "@/hooks/use-profile";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Camera, Loader2, Save, X } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { API } from "@/lib/constants";
 
 export function EditProfile() {
     const { profile, refetch } = useProfile();
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState("");
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [uploading, setUploading] = useState(false);
 
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
+        bio: "",
         dateOfBirth: "",
         address: "",
         city: "",
@@ -33,6 +38,7 @@ export function EditProfile() {
             setFormData({
                 firstName: profile.firstName || "",
                 lastName: profile.lastName || "",
+                bio: profile.bio || "",
                 dateOfBirth: profile.dateOfBirth ? new Date(profile.dateOfBirth).toISOString().split('T')[0] : "",
                 address: profile.address?.street || "",
                 city: profile.address?.city || "",
@@ -43,8 +49,67 @@ export function EditProfile() {
         }
     }, [profile]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Validate file type and size
+        if (!file.type.startsWith('image/')) {
+            setError("Please upload an image file");
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+            setError("Image size should be less than 5MB");
+            return;
+        }
+
+        setUploading(true);
+        setError("");
+
+        try {
+            // Convert to Base64
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = async () => {
+                const base64Image = reader.result as string;
+
+                // Upload to backend
+                const response = await fetch(`${API.BASE_URL}/api/profile/avatar`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem('token') || ''}`
+                    },
+                    body: JSON.stringify({ avatarUrl: base64Image }),
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || "Failed to upload image");
+                }
+
+                setSuccess(true);
+                refetch(); // Refresh to show new image
+                setTimeout(() => setSuccess(false), 3000);
+            };
+            reader.onerror = () => {
+                throw new Error("Failed to read file");
+            };
+        } catch (err: any) {
+            setError(err.message || "Failed to upload image");
+        } finally {
+            setUploading(false);
+            // Reset file input
+            if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+            }
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -58,6 +123,7 @@ export function EditProfile() {
             const apiData = {
                 firstName: formData.firstName,
                 lastName: formData.lastName,
+                bio: formData.bio,
                 dateOfBirth: formData.dateOfBirth,
                 address: {
                     street: formData.address,
@@ -68,11 +134,11 @@ export function EditProfile() {
                 }
             };
 
-            const response = await fetch("/api/profile", {
+            const response = await fetch(`${API.BASE_URL}/api/profile`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem('auth_token') || ''}`
+                    "Authorization": `Bearer ${localStorage.getItem('token') || ''}`
                 },
                 body: JSON.stringify(apiData),
             });
@@ -118,15 +184,28 @@ export function EditProfile() {
                 <CardContent className="px-4 sm:px-6">
                     <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
                         <Avatar className="w-20 h-20 sm:w-24 sm:h-24 border-4 border-gray-100">
-                            <AvatarImage src="/placeholder-avatar.png" />
-                            <AvatarFallback className="bg-brand-green text-white text-2xl">U</AvatarFallback>
+                            <AvatarImage src={profile?.profileImage || profile?.profilePicture?.url || "/placeholder-user.jpg"} />
+                            <AvatarFallback className="bg-brand-green text-white text-2xl">
+                                {formData.firstName?.charAt(0) || "U"}
+                            </AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-                            <Button className="bg-brand-green hover:bg-brand-green/90 gap-2 w-full sm:w-auto text-sm">
-                                <Camera className="w-4 h-4" />
-                                Upload Photo
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                className="hidden"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                            />
+                            <Button
+                                className="bg-brand-green hover:bg-brand-green/90 gap-2 w-full sm:w-auto text-sm"
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={uploading}
+                            >
+                                {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
+                                {uploading ? "Uploading..." : "Upload Photo"}
                             </Button>
-                            <Button variant="outline" className="border-gray-300 w-full sm:w-auto text-sm">Remove</Button>
+
                         </div>
                     </div>
                 </CardContent>
@@ -162,6 +241,18 @@ export function EditProfile() {
                                     onChange={handleChange}
                                     placeholder="Doe"
                                     className="border-gray-300"
+                                />
+                            </div>
+
+                            <div className="space-y-2 md:col-span-2">
+                                <Label htmlFor="bio">Bio</Label>
+                                <Textarea
+                                    id="bio"
+                                    name="bio"
+                                    value={formData.bio}
+                                    onChange={handleChange}
+                                    placeholder="Tell us a little about yourself"
+                                    className="border-gray-300 resize-none h-24"
                                 />
                             </div>
 

@@ -139,7 +139,7 @@ export const sendOTPEmail = async (email: string, otp: string) => {
 };
 
 export const sendPasswordResetEmail = async (email: string, resetToken: string) => {
-  const resetUrl = `${process.env.APP_URL || "http://localhost:3000"}/auth/reset-password?token=${resetToken}`;
+  const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:3000"}/auth/reset-password?token=${resetToken}`;
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

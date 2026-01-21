@@ -6,32 +6,39 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { API } from '@/lib/constants'
 
 export interface ProfileData {
   userId: string
   firstName: string
   lastName: string
   email: string
-  phone: string
-  phoneVerified: boolean
-  dateOfBirth: string
-  gender: string
-  address: {
+  phoneNumber?: string
+  emailVerified: boolean
+  dateOfBirth?: string
+  address?: {
     street: string
     city: string
     state: string
     postalCode: string
     country: string
   }
+  profileImage?: string
   profilePicture?: {
     url: string
     uploadedAt: string
   }
-  bio: string
-  emergencyContact: {
-    name: string
-    phone: string
-    relationship: string
+  bio?: string
+  preferences?: {
+    notifications?: {
+      email?: boolean
+      push?: boolean
+      sms?: boolean
+      marketing?: boolean
+      security?: boolean
+    }
+    language?: string
+    currency?: string
   }
   accountTier: 'basic' | 'pro' | 'business'
   updatedAt: string
@@ -64,12 +71,20 @@ export function useProfile(): UseProfileReturn {
     abortControllerRef.current = new AbortController()
 
     try {
-      const response = await fetch('/api/profile', {
+      const response = await fetch(`${API.BASE_URL}/api/profile`, {
         headers: {
+          'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token') || ''}`,
         },
         signal: abortControllerRef.current.signal,
       })
+
+      if (response.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/auth/login';
+        return;
+      }
 
       if (!response.ok) {
         throw new Error('Failed to fetch profile')

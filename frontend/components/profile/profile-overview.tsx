@@ -39,7 +39,7 @@ export function ProfileOverview() {
                         {/* Avatar */}
                         <div className="relative">
                             <Avatar className="w-20 h-20 sm:w-24 sm:h-24 border-4 border-white shadow-xl">
-                                <AvatarImage src={user?.profilePicture?.url} alt={`${user?.firstName} ${user?.lastName}`} />
+                                <AvatarImage src={user?.profileImage || user?.profilePicture?.url || "/placeholder-user.jpg"} alt={`${user?.firstName} ${user?.lastName}`} />
                                 <AvatarFallback className="bg-brand-green text-white text-2xl font-bold">
                                     {user?.firstName?.charAt(0) || "U"}
                                 </AvatarFallback>

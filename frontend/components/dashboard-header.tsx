@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { Bell, Menu } from "lucide-react"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import { API } from "@/lib/constants"
 
 interface DashboardHeaderProps {
   title?: string
@@ -28,8 +29,11 @@ export function DashboardHeader({ title = "Dashboard", onMenuClick, showMobileTi
     const fetchNotifications = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('/api/notifications', {
-          headers: { 'Authorization': `Bearer ${token}` }
+        const response = await fetch(`${API.BASE_URL}/api/notifications`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
         })
         if (response.ok) {
           const data = await response.json()

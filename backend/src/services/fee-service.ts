@@ -3,8 +3,8 @@
  * Transparent fee calculation and disclosure
  */
 
-import { FeeDisclosure } from '@/lib/models/fee-disclosure';
-import { connectDB } from '@/lib/db';
+import { FeeDisclosure } from '@/models/fee-disclosure';
+import { connectDB } from '@/config/db';
 
 export interface FeeCalculation {
   amount: number;

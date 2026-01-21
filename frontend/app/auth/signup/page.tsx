@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Eye, EyeOff } from "lucide-react";
+import { API } from "@/lib/constants";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -78,7 +79,9 @@ export default function SignUpPage() {
       const challenge = challenges[challengeData.selectedChallenge as keyof typeof challenges];
       const dailyAmount = challenge.base * challengeData.selectedMultiplier;
 
-      const response = await fetch("/api/auth/signup", {
+      const apiUrl = API.BASE_URL;
+      console.log('Signup Debug - Target API URL:', apiUrl); // Debug log
+      const response = await fetch(`${apiUrl}/api/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -88,20 +91,23 @@ export default function SignUpPage() {
           selectedChallenge: challengeData.selectedChallenge,
           multiplier: challengeData.selectedMultiplier,
         }),
+        credentials: "include",
       });
 
       const data = await response.json();
 
       if (!response.ok) {
         setError(data.error || "Signup failed");
+        setIsLoading(false);
         return;
       }
 
-      // Redirect to login
+      // Show success message and redirect to login
+      alert("Account created successfully! Please log in.");
       router.push("/auth/login");
     } catch (err) {
+      console.error("Signup error:", err);
       setError("An error occurred. Please try again.");
-    } finally {
       setIsLoading(false);
     }
   };

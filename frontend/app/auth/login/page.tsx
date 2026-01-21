@@ -25,7 +25,8 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/auth/login", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://save-2740-backend.vercel.app";
+      const response = await fetch(`${apiUrl}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -41,10 +42,12 @@ export default function LoginPage() {
         return;
       }
 
-      // Save token to localStorage
-      if (data.data?.token) {
-        localStorage.setItem("token", data.data.token);
+      // Extract from correct structure: data.data.session.accessToken
+      if (data.data?.session?.accessToken) {
+        localStorage.setItem("token", data.data.session.accessToken);
         localStorage.setItem("userId", data.data.user.id);
+        localStorage.setItem("session", JSON.stringify(data.data.session));
+        localStorage.setItem("user", JSON.stringify(data.data.user));
       }
 
       // Login successful - redirect to dashboard

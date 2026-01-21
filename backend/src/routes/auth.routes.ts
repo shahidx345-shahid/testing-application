@@ -18,6 +18,13 @@ import {
     checkRateLimit,
     resetRateLimit,
 } from '../utils/auth-utils';
+import {
+    generateAccessToken,
+    createRefreshToken,
+    verifyRefreshToken,
+    revokeRefreshToken,
+    revokeAllUserTokens
+} from '../utils/token-utils';
 import { connectDB } from '../config/db';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
 import { validate } from '../middleware/validate';
@@ -27,6 +34,14 @@ import { authLimiter, requestPasswordResetLimiter } from '../middleware/rate-lim
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+
+// Cookie options for httpOnly cookies
+const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+    sameSite: 'strict' as const,
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+};
 
 // Simple UUID generator
 function uuidv4() {
@@ -260,19 +275,25 @@ router.post('/login', authLimiter, validate(loginSchema), async (req: Request, r
         user.lastLogin = new Date();
         await user.save();
 
-        const token = jwt.sign(
-            {
-                userId: user._id.toString(),
-                email: user.email,
-            },
-            JWT_SECRET,
-            { expiresIn: '24h' }
-        );
+        // Generate access token (short-lived)
+        const accessToken = generateAccessToken({
+            userId: user._id.toString(),
+            email: user.email,
+        });
+
+        // Generate refresh token (long-lived)
+        const ipAddress = req.ip || req.socket.remoteAddress;
+        const refreshTokenData = await createRefreshToken(user._id.toString(), ipAddress);
+
+        // Set refresh token as httpOnly cookie
+        res.cookie('refreshToken', refreshTokenData.token, cookieOptions);
+
+        // Calculate expiry time (15 minutes from now)
+        const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
         res.json({
             success: true,
             data: {
-                token,
                 user: {
                     id: user._id.toString(),
                     email: user.email,
@@ -280,6 +301,12 @@ router.post('/login', authLimiter, validate(loginSchema), async (req: Request, r
                     lastName: user.lastName,
                     emailVerified: user.emailVerified,
                     accountStatus: user.accountStatus,
+                },
+                session: {
+                    id: `session_${user._id.toString()}_${Date.now()}`,
+                    accessToken,
+                    refreshToken: refreshTokenData.token,
+                    expiresAt: expiresAt.toISOString()
                 }
             }
         });
@@ -320,11 +347,124 @@ router.get('/me', authenticateToken, async (req: AuthRequest, res: Response) => 
 });
 
 // POST /api/auth/logout
-router.post('/logout', (req: Request, res: Response) => {
-    res.json({
-        success: true,
-        message: 'Logged out successfully'
-    });
+router.post('/logout', authenticateToken, async (req: AuthRequest, res: Response) => {
+    try {
+        // Get refresh token from cookie
+        const refreshToken = req.cookies.refreshToken;
+
+        if (refreshToken) {
+            const ipAddress = req.ip || req.socket.remoteAddress;
+            await revokeRefreshToken(refreshToken, ipAddress);
+        }
+
+        // Clear refresh token cookie
+        res.clearCookie('refreshToken', cookieOptions);
+
+        res.json({
+            success: true,
+            message: 'Logged out successfully'
+        });
+    } catch (error) {
+        console.error('Logout error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to logout'
+        });
+    }
+});
+
+// POST /api/auth/refresh - Refresh access token using refresh token
+router.post('/refresh', async (req: Request, res: Response) => {
+    try {
+        await connectDB();
+
+        const oldRefreshToken = req.cookies.refreshToken;
+
+        if (!oldRefreshToken) {
+            return res.status(401).json({
+                success: false,
+                error: 'Refresh token required'
+            });
+        }
+
+        // Verify refresh token
+        const verification = await verifyRefreshToken(oldRefreshToken);
+
+        if (!verification.valid || !verification.userId) {
+            return res.status(401).json({
+                success: false,
+                error: verification.message || 'Invalid refresh token'
+            });
+        }
+
+        // Get user
+        const user = await User.findById(verification.userId);
+
+        if (!user || user.accountStatus !== 'active') {
+            return res.status(401).json({
+                success: false,
+                error: 'User not found or inactive'
+            });
+        }
+
+        // Generate new access token
+        const accessToken = generateAccessToken({
+            userId: user._id.toString(),
+            email: user.email,
+        });
+
+        // Generate new refresh token and revoke old one
+        const ipAddress = req.ip || req.socket.remoteAddress;
+        const newRefreshTokenData = await createRefreshToken(user._id.toString(), ipAddress);
+        await revokeRefreshToken(oldRefreshToken, ipAddress, newRefreshTokenData.token);
+
+        // Set new refresh token cookie
+        res.cookie('refreshToken', newRefreshTokenData.token, cookieOptions);
+
+        res.json({
+            success: true,
+            data: {
+                accessToken,
+                user: {
+                    id: user._id.toString(),
+                    email: user.email,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    emailVerified: user.emailVerified,
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Refresh token error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to refresh token'
+        });
+    }
+});
+
+// POST /api/auth/revoke-all - Revoke all refresh tokens for current user
+router.post('/revoke-all', authenticateToken, async (req: AuthRequest, res: Response) => {
+    try {
+        await connectDB();
+
+        const count = await revokeAllUserTokens(req.userId!);
+
+        // Clear refresh token cookie
+        res.clearCookie('refreshToken', cookieOptions);
+
+        res.json({
+            success: true,
+            message: `Revoked ${count} active session(s)`,
+            data: { revokedCount: count }
+        });
+    } catch (error) {
+        console.error('Revoke all tokens error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to revoke tokens'
+        });
+    }
 });
 
 // POST /api/auth/verify-email
@@ -376,20 +516,24 @@ router.post('/verify-email', validate(verifyEmailSchema), async (req: Request, r
         verification.used = true;
         await verification.save();
 
-        const token = jwt.sign(
-            {
-                userId: user._id.toString(),
-                email: user.email,
-            },
-            JWT_SECRET,
-            { expiresIn: '24h' }
-        );
+        // Generate access token
+        const accessToken = generateAccessToken({
+            userId: user._id.toString(),
+            email: user.email,
+        });
+
+        // Generate refresh token
+        const ipAddress = req.ip || req.socket.remoteAddress;
+        const refreshTokenData = await createRefreshToken(user._id.toString(), ipAddress);
+
+        // Set refresh token as httpOnly cookie
+        res.cookie('refreshToken', refreshTokenData.token, cookieOptions);
 
         res.json({
             success: true,
             message: 'Email verified successfully',
             data: {
-                token,
+                accessToken,
                 user: {
                     id: user._id.toString(),
                     email: user.email,
@@ -577,6 +721,42 @@ router.post('/reset-password', validate(resetPasswordSchema), async (req: Reques
             success: false,
             error: 'Failed to reset password'
         });
+    }
+});
+
+// POST /api/auth/change-password
+router.post('/change-password', authenticateToken, async (req: AuthRequest, res: Response) => {
+    try {
+        await connectDB();
+        const { currentPassword, newPassword } = req.body;
+
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({ success: false, error: 'Current and new password are required' });
+        }
+
+        const user = await User.findById(req.userId);
+        if (!user) {
+            return res.status(404).json({ success: false, error: 'User not found' });
+        }
+
+        const isMatch = await bcrypt.compare(currentPassword, user.passwordHash);
+        if (!isMatch) {
+            return res.status(400).json({ success: false, error: 'Incorrect current password' });
+        }
+
+        const passwordValidation = validatePassword(newPassword);
+        if (!passwordValidation.valid) {
+            return res.status(400).json({ success: false, error: passwordValidation.errors.join('. ') });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        user.passwordHash = await bcrypt.hash(newPassword, salt);
+        await user.save();
+
+        res.json({ success: true, message: 'Password changed successfully' });
+    } catch (error) {
+        console.error('Change password error:', error);
+        res.status(500).json({ success: false, error: 'Failed to change password' });
     }
 });
 

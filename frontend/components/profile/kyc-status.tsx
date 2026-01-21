@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Loader2, CheckCircle2, AlertCircle, Clock, XCircle, Camera, FileText, Upload, X, Eye, FileCheck } from 'lucide-react'
+import { API } from '@/lib/constants'
 
 interface KYCStatus {
   status: 'not_started' | 'pending' | 'verified' | 'rejected'
@@ -50,16 +51,30 @@ export function KYCStatus() {
   useEffect(() => {
     const fetchKYCStatus = async () => {
       try {
-        const response = await fetch('/api/kyc/status', {
+        const response = await fetch(`${API.BASE_URL}/api/kyc/status`, {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`,
+            'Authorization': `Bearer ${localStorage.getItem('token') || ''}`,
           },
         })
 
         if (!response.ok) throw new Error('Failed to fetch KYC status')
 
         const { data } = await response.json()
-        setKYCStatus(data)
+
+        // Defensive: Ensure all required fields exist even if backend is outdated
+        const safeData = {
+          ...data,
+          limits: data.limits || {
+            dailyTransactionLimit: 1000,
+            monthlyTransactionLimit: 5000,
+            dailyWithdrawalLimit: 0
+          },
+          documents: data.documents || {},
+          completionPercentage: data.completionPercentage || 0,
+          status: data.status || 'not_started'
+        }
+
+        setKYCStatus(safeData)
       } catch (error) {
         console.error('Error fetching KYC status:', error)
       } finally {
@@ -112,10 +127,10 @@ export function KYCStatus() {
       formData.append('file', file)
       formData.append('documentType', documentType)
 
-      const response = await fetch('/api/kyc/documents', {
+      const response = await fetch(`${API.BASE_URL}/api/kyc/documents`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`,
+          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`,
         },
         body: formData,
       })

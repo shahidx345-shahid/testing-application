@@ -5,17 +5,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { WalletService } from "@/lib/wallet-service"
+import { API } from "@/lib/constants"
 import { Loader2, DollarSign } from "lucide-react"
 
 interface AddMoneyModalProps {
     isOpen: boolean
     onClose: () => void
     onSuccess: () => void
+    initialAmount?: number
 }
 
-export function AddMoneyModal({ isOpen, onClose, onSuccess }: AddMoneyModalProps) {
-    const [amount, setAmount] = useState("")
+export function AddMoneyModal({ isOpen, onClose, onSuccess, initialAmount }: AddMoneyModalProps) {
+    const [amount, setAmount] = useState(initialAmount ? initialAmount.toString() : "")
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState("")
 
@@ -30,7 +31,7 @@ export function AddMoneyModal({ isOpen, onClose, onSuccess }: AddMoneyModalProps
 
         try {
             // Create a direct API call or use the service if updated
-            const response = await fetch('/api/wallet/deposit', {
+            const response = await fetch(`${API.BASE_URL}/api/wallet/deposit`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -90,7 +91,7 @@ export function AddMoneyModal({ isOpen, onClose, onSuccess }: AddMoneyModalProps
                         {loading ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Processing...
+                                "Processing..."
                             </>
                         ) : (
                             "Confirm Deposit"

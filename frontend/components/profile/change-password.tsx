@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { API } from "@/lib/constants";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,11 +47,11 @@ export function ChangePassword() {
         setLoading(true);
 
         try {
-            const response = await fetch("/api/auth/change-password", {
+            const response = await fetch(`${API.BASE_URL}/api/auth/change-password`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem('auth_token') || ''}`
+                    "Authorization": `Bearer ${localStorage.getItem('token') || ''}`
                 },
                 body: JSON.stringify({
                     currentPassword: formData.currentPassword,

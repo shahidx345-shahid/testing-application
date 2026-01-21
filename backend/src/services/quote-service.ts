@@ -3,8 +3,8 @@
  * Handles daily quote rotation and retrieval
  */
 
-import { Quote, DailyQuote } from '@/lib/models/quote-of-day';
-import { connectDB } from '@/lib/db';
+import { Quote, DailyQuote } from '@/models/quote-of-day';
+import { connectDB } from '@/config/db';
 
 // Default quotes if none in database
 const DEFAULT_QUOTES = [
@@ -66,7 +66,7 @@ export async function getTodaysQuote(): Promise<{ text: string; author: string }
   const activeQuotes = await Quote.find({ isActive: true }).sort({ displayOrder: 1 });
 
   let quotesToUse = activeQuotes.length > 0 
-    ? activeQuotes.map(q => ({ text: q.text, author: q.author }))
+    ? activeQuotes.map((q: any) => ({ text: q.text, author: q.author }))
     : DEFAULT_QUOTES;
 
   // If no quotes in DB, seed them

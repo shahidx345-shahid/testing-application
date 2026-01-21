@@ -1,0 +1,1286 @@
+{
+	"info": {
+		"_postman_id": "save2740-api-collection",
+		"name": "Save2740 Backend API",
+		"description": "Complete API collection for Save2740 fintech backend - 52+ endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Sign Up",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    pm.test('Sign up successful', function() {",
+									"        pm.response.to.have.status(201);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@postman.com\",\n  \"password\": \"Test123456\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/auth/signup",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5000",
+							"path": ["api", "auth", "signup"]
+						}
+					}
+				},
+				{
+					"name": "Verify Email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.accessToken) {",
+									"        pm.environment.set('access_token', jsonData.data.accessToken);",
+									"        pm.test('Token saved', function() {",
+									"            pm.expect(jsonData.data.accessToken).to.be.a('string');",
+									"        });",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{test_email}}\",\n  \"code\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/verify-email",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "verify-email"]
+						}
+					}
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.accessToken) {",
+									"        pm.environment.set('access_token', jsonData.data.accessToken);",
+									"        pm.test('Login successful', function() {",
+									"            pm.response.to.have.status(200);",
+									"            pm.expect(jsonData.data.accessToken).to.be.a('string');",
+									"        });",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{test_email}}\",\n  \"password\": \"Test123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/me",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "me"]
+						}
+					}
+				},
+				{
+					"name": "Resend Verification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{test_email}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/resend-verification",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "resend-verification"]
+						}
+					}
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{test_email}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/forgot-password",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "forgot-password"]
+						}
+					}
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"reset-token-from-email\",\n  \"newPassword\": \"NewPassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/reset-password",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "reset-password"]
+						}
+					}
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/refresh",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "refresh"]
+						}
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/logout",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "logout"]
+						}
+					}
+				},
+				{
+					"name": "Revoke All Sessions",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/revoke-all",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "revoke-all"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Profile",
+			"item": [
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/profile",
+							"host": ["{{base_url}}"],
+							"path": ["profile"]
+						}
+					}
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\",\n  \"phoneNumber\": \"+1234567890\",\n  \"dateOfBirth\": \"1990-01-01\",\n  \"address\": {\n    \"street\": \"123 Main St\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"zipCode\": \"10001\",\n    \"country\": \"US\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/profile",
+							"host": ["{{base_url}}"],
+							"path": ["profile"]
+						}
+					}
+				},
+				{
+					"name": "Update Avatar",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"avatarUrl\": \"https://example.com/avatar.jpg\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/profile/avatar",
+							"host": ["{{base_url}}"],
+							"path": ["profile", "avatar"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Dashboard Overview",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/dashboard/overview",
+							"host": ["{{base_url}}"],
+							"path": ["dashboard", "overview"]
+						}
+					}
+				},
+				{
+					"name": "Dashboard Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/dashboard/stats",
+							"host": ["{{base_url}}"],
+							"path": ["dashboard", "stats"]
+						}
+					}
+				},
+				{
+					"name": "Savings Breakdown",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/dashboard/breakdown",
+							"host": ["{{base_url}}"],
+							"path": ["dashboard", "breakdown"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Wallet",
+			"item": [
+				{
+					"name": "Get Wallet",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/wallet",
+							"host": ["{{base_url}}"],
+							"path": ["wallet"]
+						}
+					}
+				},
+				{
+					"name": "Deposit Funds",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 100,\n  \"paymentMethodId\": \"pm_test_123\",\n  \"currency\": \"usd\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wallet/deposit",
+							"host": ["{{base_url}}"],
+							"path": ["wallet", "deposit"]
+						}
+					}
+				},
+				{
+					"name": "Withdraw Funds",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 50,\n  \"bankAccountId\": \"ba_test_123\",\n  \"reason\": \"Emergency withdrawal\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wallet/withdraw",
+							"host": ["{{base_url}}"],
+							"path": ["wallet", "withdraw"]
+						}
+					}
+				},
+				{
+					"name": "Transaction History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/wallet/transactions",
+							"host": ["{{base_url}}"],
+							"path": ["wallet", "transactions"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Groups",
+			"item": [
+				{
+					"name": "List Groups",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/groups",
+							"host": ["{{base_url}}"],
+							"path": ["groups"]
+						}
+					}
+				},
+				{
+					"name": "Create Group",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Family Savings Circle\",\n  \"purpose\": \"Save for vacation\",\n  \"contributionAmount\": 100,\n  \"frequency\": \"monthly\",\n  \"maxMembers\": 10,\n  \"payoutOrderRule\": \"as-joined\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/groups",
+							"host": ["{{base_url}}"],
+							"path": ["groups"]
+						}
+					}
+				},
+				{
+					"name": "Join Group",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"joinCode\": \"ABC123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/groups/join",
+							"host": ["{{base_url}}"],
+							"path": ["groups", "join"]
+						}
+					}
+				},
+				{
+					"name": "Leave Group",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"groupId\": \"group_id_here\",\n  \"reason\": \"Personal reasons\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/groups/leave",
+							"host": ["{{base_url}}"],
+							"path": ["groups", "leave"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Save2740 Challenge",
+			"item": [
+				{
+					"name": "Challenge Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/save2740/status",
+							"host": ["{{base_url}}"],
+							"path": ["save2740", "status"]
+						}
+					}
+				},
+				{
+					"name": "Join Challenge",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"challengeType\": \"daily\",\n  \"multiplier\": 1,\n  \"autoDebit\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/save2740/join",
+							"host": ["{{base_url}}"],
+							"path": ["save2740", "join"]
+						}
+					}
+				},
+				{
+					"name": "Make Contribution",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 27.40,\n  \"paymentMethodId\": \"pm_test_123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/save2740/contribute",
+							"host": ["{{base_url}}"],
+							"path": ["save2740", "contribute"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Saver Pockets",
+			"item": [
+				{
+					"name": "List Pockets",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/saver-pockets",
+							"host": ["{{base_url}}"],
+							"path": ["saver-pockets"]
+						}
+					}
+				},
+				{
+					"name": "Create Pocket",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Emergency Fund\",\n  \"goalAmount\": 5000,\n  \"targetDate\": \"2026-12-31\",\n  \"description\": \"6-month emergency fund\",\n  \"category\": \"emergency\",\n  \"icon\": \"🏥\",\n  \"color\": \"#FF6B6B\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/saver-pockets",
+							"host": ["{{base_url}}"],
+							"path": ["saver-pockets"]
+						}
+					}
+				},
+				{
+					"name": "Update Pocket",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Emergency Fund\",\n  \"goalAmount\": 6000\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/saver-pockets/:id",
+							"host": ["{{base_url}}"],
+							"path": ["saver-pockets", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "pocket_id_here"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Pocket",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/saver-pockets/:id",
+							"host": ["{{base_url}}"],
+							"path": ["saver-pockets", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "pocket_id_here"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Payments",
+			"item": [
+				{
+					"name": "Payment History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/payments",
+							"host": ["{{base_url}}"],
+							"path": ["payments"]
+						}
+					}
+				},
+				{
+					"name": "Create Payment Intent",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 100,\n  \"currency\": \"usd\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/payments/intent",
+							"host": ["{{base_url}}"],
+							"path": ["payments", "intent"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Payment Methods",
+			"item": [
+				{
+					"name": "List Payment Methods",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/payment-methods",
+							"host": ["{{base_url}}"],
+							"path": ["payment-methods"]
+						}
+					}
+				},
+				{
+					"name": "Add Payment Method",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"card\",\n  \"name\": \"Visa Card\",\n  \"last4\": \"4242\",\n  \"isDefault\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/payment-methods",
+							"host": ["{{base_url}}"],
+							"path": ["payment-methods"]
+						}
+					}
+				},
+				{
+					"name": "Remove Payment Method",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/payment-methods/:id",
+							"host": ["{{base_url}}"],
+							"path": ["payment-methods", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "payment_method_id"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Notifications",
+			"item": [
+				{
+					"name": "Get Notifications",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/notifications",
+							"host": ["{{base_url}}"],
+							"path": ["notifications"]
+						}
+					}
+				},
+				{
+					"name": "Mark as Read",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/notifications/:id/read",
+							"host": ["{{base_url}}"],
+							"path": ["notifications", ":id", "read"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "notification_id"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Mark All as Read",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/notifications/all/read",
+							"host": ["{{base_url}}"],
+							"path": ["notifications", "all", "read"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "KYC",
+			"item": [
+				{
+					"name": "KYC Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/kyc/status",
+							"host": ["{{base_url}}"],
+							"path": ["kyc", "status"]
+						}
+					}
+				},
+				{
+					"name": "Submit KYC",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"documentType\": \"drivers_license\",\n  \"documentNumber\": \"DL12345678\",\n  \"documentFront\": \"https://example.com/doc-front.jpg\",\n  \"documentBack\": \"https://example.com/doc-back.jpg\",\n  \"selfie\": \"https://example.com/selfie.jpg\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"dateOfBirth\": \"1990-01-01\",\n  \"address\": {\n    \"street\": \"123 Main St\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"zipCode\": \"10001\",\n    \"country\": \"US\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/kyc/submit",
+							"host": ["{{base_url}}"],
+							"path": ["kyc", "submit"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Support",
+			"item": [
+				{
+					"name": "Create Support Ticket",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"subject\": \"Cannot withdraw funds\",\n  \"message\": \"I'm getting an error when trying to withdraw\",\n  \"category\": \"withdrawal\",\n  \"priority\": \"high\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/support/ticket",
+							"host": ["{{base_url}}"],
+							"path": ["support", "ticket"]
+						}
+					}
+				},
+				{
+					"name": "Chat History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/support-chat/history",
+							"host": ["{{base_url}}"],
+							"path": ["support-chat", "history"]
+						}
+					}
+				},
+				{
+					"name": "Send Chat Message",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"message\": \"Hello, I need help with my account\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/support-chat/message",
+							"host": ["{{base_url}}"],
+							"path": ["support-chat", "message"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Referrals",
+			"item": [
+				{
+					"name": "Referral Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/referrals/stats",
+							"host": ["{{base_url}}"],
+							"path": ["referrals", "stats"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Daily Savings",
+			"item": [
+				{
+					"name": "Get Daily Savings Config",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/daily-savings",
+							"host": ["{{base_url}}"],
+							"path": ["daily-savings"]
+						}
+					}
+				},
+				{
+					"name": "Update Daily Savings",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 27.40,\n  \"note\": \"Daily savings goal\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/daily-savings",
+							"host": ["{{base_url}}"],
+							"path": ["daily-savings"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Other APIs",
+			"item": [
+				{
+					"name": "Quote of the Day",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/quote-of-day",
+							"host": ["{{base_url}}"],
+							"path": ["quote-of-day"]
+						}
+					}
+				},
+				{
+					"name": "Banking Accounts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/banking",
+							"host": ["{{base_url}}"],
+							"path": ["banking"]
+						}
+					}
+				},
+				{
+					"name": "Platform Fees",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/fees",
+							"host": ["{{base_url}}"],
+							"path": ["fees"]
+						}
+					}
+				},
+				{
+					"name": "Delete Account",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/account",
+							"host": ["{{base_url}}"],
+							"path": ["account"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Webhooks",
+			"item": [
+				{
+					"name": "Stripe Webhook",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Stripe-Signature",
+								"value": "stripe_signature_here"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"payment_intent.succeeded\",\n  \"data\": {}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/webhooks/stripe",
+							"host": ["{{base_url}}"],
+							"path": ["webhooks", "stripe"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Health Check",
+			"item": [
+				{
+					"name": "Health Check",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Server is healthy', function() {",
+									"    pm.response.to.have.status(200);",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"    pm.expect(jsonData.data.status).to.eql('healthy');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health",
+							"host": ["{{base_url}}"],
+							"path": ["health"]
+						}
+					}
+				},
+				{
+					"name": "Readiness Probe",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health/ready",
+							"host": ["{{base_url}}"],
+							"path": ["health", "ready"]
+						}
+					}
+				},
+				{
+					"name": "Liveness Probe",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health/live",
+							"host": ["{{base_url}}"],
+							"path": ["health", "live"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:5000/api",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "test_email",
+			"value": "test@postman.com",
+			"type": "string"
+		}
+	]
+}

@@ -74,10 +74,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = useCallback(async (credentials: LoginPayload) => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
     try {
-      const response = await fetch("/api/auth/login", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://save-2740-backend.vercel.app";
+      const response = await fetch(`${apiUrl}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
+        credentials: "include",
       });
 
       const data = await response.json();
@@ -88,6 +90,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const { user, session } = data.data;
 
+      // Save tokens to localStorage
+      localStorage.setItem("token", session.accessToken); // For backward compatibility
+      localStorage.setItem("userId", user.id);
       localStorage.setItem("session", JSON.stringify(session));
       localStorage.setItem("user", JSON.stringify(user));
 

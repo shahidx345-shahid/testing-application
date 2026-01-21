@@ -9,12 +9,19 @@ export interface ITransaction extends Document {
     paymentMethodId?: string; // ID of the card/bank used if applicable
     referenceId?: string; // External ref (Stripe ID)
     details?: any; // Extra metadata
+    transactionId: string;
     createdAt: Date;
     updatedAt: Date;
 }
 
 const TransactionSchema = new Schema<ITransaction>({
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    transactionId: {
+        type: String,
+        required: true,
+        unique: true,
+        default: () => `TXN-${require('crypto').randomBytes(6).toString('hex').toUpperCase()}`
+    },
     type: {
         type: String,
         required: true,

@@ -17,21 +17,22 @@ export const authenticateToken = async (
     next: NextFunction
 ) => {
     try {
-        // Get token from Authorization header or cookie
+        // Get token from Authorization header (Bearer token)
         const authHeader = req.headers.authorization;
         const token = authHeader?.startsWith('Bearer ')
             ? authHeader.substring(7)
-            : req.cookies?.authToken;
+            : null;
 
         if (!token) {
             return res.status(401).json({
                 success: false,
-                error: 'Access token required'
+                error: 'Access token required',
+                code: 'TOKEN_REQUIRED'
             });
         }
 
         // Verify token
-        const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; email?: string };
+        const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; email?: string; role?: string };
 
         // Attach user ID to request
         req.userId = decoded.userId;
@@ -42,14 +43,16 @@ export const authenticateToken = async (
         if (error instanceof jwt.TokenExpiredError) {
             return res.status(401).json({
                 success: false,
-                error: 'Token expired'
+                error: 'Access token expired',
+                code: 'TOKEN_EXPIRED'
             });
         }
 
         if (error instanceof jwt.JsonWebTokenError) {
             return res.status(401).json({
                 success: false,
-                error: 'Invalid token'
+                error: 'Invalid access token',
+                code: 'TOKEN_INVALID'
             });
         }
 

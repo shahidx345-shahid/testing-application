@@ -90,7 +90,7 @@ const GroupSchema = new Schema<IGroup>(
         },
         currentMembers: { type: Number, default: 1 },
 
-        joinCode: { type: String, required: true, unique: true, uppercase: true },
+        joinCode: { type: String, required: true, uppercase: true }, // Index defined separately below
         referralLink: { type: String, required: true },
 
         creatorId: { type: Schema.Types.ObjectId, ref: 'User', required: true },

@@ -14,7 +14,7 @@ export const FINANCIAL = {
 
 // API Configuration
 export const API = {
-  BASE_URL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000",
+  BASE_URL: process.env.NODE_ENV === "development" ? "http://localhost:5000" : (process.env.NEXT_PUBLIC_API_URL || "https://save-2740-backend.vercel.app"),
   ENDPOINTS: {
     WALLET: "/api/wallet",
     TRANSACTIONS: "/api/wallet/transactions",

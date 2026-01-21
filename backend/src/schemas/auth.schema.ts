@@ -7,7 +7,7 @@ export const signupSchema = z.object({
         .regex(/[0-9]/, 'Password must contain at least one number'),
     firstName: z.string().min(2, 'First name is required'),
     lastName: z.string().optional(),
-    selectedChallenge: z.enum(['weekly', 'monthly']).optional(),
+    selectedChallenge: z.enum(['daily', 'weekly', 'monthly']).optional(),
     multiplier: z.number().min(1).max(10).optional(),
 });
 

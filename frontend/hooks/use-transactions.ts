@@ -60,7 +60,13 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
         endDate
       );
 
-      if (response.success && response.data) {
+      if (response.success && response.data?.data?.transactions) {
+        // Handle nested extraction: apiClient wrapper -> backend extraction -> data property
+        const transactions = response.data.data.transactions.slice(0, limit);
+        setData(transactions);
+        setLastUpdated(new Date());
+      } else if (response.success && response.data?.transactions) {
+        // Fallback if structure is flat
         const transactions = response.data.transactions.slice(0, limit);
         setData(transactions);
         setLastUpdated(new Date());

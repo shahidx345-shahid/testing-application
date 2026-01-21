@@ -1,6 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import { API } from '@/lib/constants';
 
 interface ChatMessage {
     _id: string;
@@ -48,11 +49,11 @@ export function SupportChatProvider({ children }: { children: ReactNode }) {
     const isAuthenticated = useCallback(() => {
         // Check for token in localStorage or cookies
         if (typeof window === 'undefined') return false;
-        
+
         // Check localStorage for session
         const session = localStorage.getItem('session');
         const user = localStorage.getItem('user');
-        
+
         if (session && user) {
             try {
                 const sessionData = JSON.parse(session);
@@ -64,7 +65,7 @@ export function SupportChatProvider({ children }: { children: ReactNode }) {
                 // Invalid session data
             }
         }
-        
+
         return false;
     }, []);
 
@@ -77,11 +78,14 @@ export function SupportChatProvider({ children }: { children: ReactNode }) {
 
         try {
             const url = sessionId
-                ? `/api/support-chat/messages?sessionId=${sessionId}`
-                : '/api/support-chat/messages';
+                ? `${API.BASE_URL}/api/support-chat/messages?sessionId=${sessionId}`
+                : `${API.BASE_URL}/api/support-chat/messages`;
 
             const response = await fetch(url, {
-                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                },
             });
 
             // Handle 401 silently (user not authenticated)
@@ -122,12 +126,12 @@ export function SupportChatProvider({ children }: { children: ReactNode }) {
 
         setIsLoading(true);
         try {
-            const response = await fetch('/api/support-chat/send', {
+            const response = await fetch(`${API.BASE_URL}/api/support-chat/send`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
                 },
-                credentials: 'include',
                 body: JSON.stringify({
                     sessionId,
                     message: text,
@@ -155,12 +159,12 @@ export function SupportChatProvider({ children }: { children: ReactNode }) {
         if (!sessionId) return;
 
         try {
-            await fetch('/api/support-chat/messages', {
+            await fetch(`${API.BASE_URL}/api/support-chat/messages`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
                 },
-                credentials: 'include',
                 body: JSON.stringify({ sessionId }),
             });
 

@@ -3,9 +3,9 @@
  * Helper functions for common database operations
  */
 
-import { connectDB } from './db';
-import { Transaction, ITransaction } from './models/transaction';
-import { SavingPlan, ISavingPlan } from './models/saving-plan';
+import { connectDB } from '../config/db';
+import { Transaction, ITransaction } from '../models/transaction';
+import { SavingPlan, ISavingPlan } from '../models/saving-plan';
 
 /**
  * Create a new transaction record

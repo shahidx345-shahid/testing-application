@@ -9,6 +9,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
+import { API } from '@/lib/constants'
 
 // Lazy load chat widget to reduce initial bundle size
 const SupportChatWidget = dynamic(
@@ -38,24 +39,31 @@ export function ProtectedPage({ children, fallback }: ProtectedPageProps) {
         }
 
         // Verify token is valid with backend
-        const response = await fetch('/api/auth/me', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        })
+        try {
+          const response = await fetch(`${API.BASE_URL}/api/auth/me`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          })
 
-        if (!response.ok) {
-          console.log('Token verification failed:', response.status);
+          if (!response.ok) {
+            console.log('Token verification failed:', response.status);
+            localStorage.removeItem('token');
+            router.push('/auth/login')
+            return
+          }
+
+          // Token valid, allow access
+          setIsAuthenticated(true)
+        } catch (err) {
+          console.error('Token verification error:', err);
+          // If verification fails due to connection error, redirect to login is safer
           localStorage.removeItem('token');
-          // Token invalid, redirect to login
-          router.push('/auth/login')
-          return
+          router.push('/auth/login');
         }
 
-        // Token valid, allow access
-        setIsAuthenticated(true)
       } catch (error) {
         console.error('Auth check failed:', error)
         router.push('/auth/login')
@@ -67,7 +75,7 @@ export function ProtectedPage({ children, fallback }: ProtectedPageProps) {
     checkAuth()
   }, [router])
 
-  // Show fallback while loading - keep it minimal for speed
+  // Show fallback while loading
   if (isLoading) {
     return fallback || null
   }
