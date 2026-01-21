@@ -41,7 +41,22 @@ import {
 import hpp from 'hpp';
 import cookieParser from 'cookie-parser';
 
+import { connectDB, getConnectionStatus } from './config/db';
+
 const app: Application = express();
+
+// Database Connection Middleware for Serverless
+app.use(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        if (!getConnectionStatus()) {
+            await connectDB();
+        }
+        next();
+    } catch (error) {
+        console.error('Database connection failed:', error);
+        res.status(500).json({ error: 'Database connection failed' });
+    }
+});
 
 // Request ID for tracking
 app.use(requestId);
