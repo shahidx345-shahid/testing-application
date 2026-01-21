@@ -1,22 +1,22 @@
 {
     "version": 2,
+    "name": "save2740-backend",
     "builds": [
         {
-            "src": "dist/server.js",
+            "src": "src/app.ts",
             "use": "@vercel/node"
         }
     ],
     "routes": [
         {
-            "src": "/api/(.*)",
-            "dest": "dist/server.js"
-        },
-        {
             "src": "/(.*)",
-            "dest": "dist/server.js"
+            "dest": "src/app.ts"
         }
     ],
     "env": {
         "NODE_ENV": "production"
-    }
+    },
+    "regions": [
+        "iad1"
+    ]
 }
